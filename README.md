@@ -15,6 +15,6 @@ Score is mainly calculated from individual contributions made to the commit. The
 
 ## Team Members
 - Ryan Tsany Adelmar (1313623021)
-- Agastya Dava Nurrahman (1313623052)
 - Danar Priyo Utomo (1313623022)
 - Darrel Rafif Alfarabi (1313623032)
+- Agastya Dava Nurrahman (1313623052)

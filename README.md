@@ -14,5 +14,7 @@ Score is mainly calculated from individual contributions made to the commit. The
 - [Task 4](/function_documentation.md)
 
 ## Team Members
-- Member A
-- Member B
+- Ryan Tsany Adelmar (1313623021)
+- Agastya Dava Nurrahman (1313623052)
+- Danar Priyo Utomo (1313623022)
+- Darrel Rafif Alfarabi (1313623032)

@@ -20,6 +20,11 @@ struct io_statx {
 	struct statx __user		*buffer;
 };
 
+/**
+ * io_statx_prep - Set up an async statx request from SQE.
+ * Extracts path, flags, and output buffer from the SQE, validates input,
+ * and prepares internal data structure. Returns 0 on success or error code.
+ */
 int io_statx_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_statx *sx = io_kiocb_to_cmd(req, struct io_statx);
@@ -50,6 +55,11 @@ int io_statx_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_statx - Execute the statx() system call asynchronously.
+ * Uses prepped parameters to invoke do_statx(), stores result in req.
+ * Always returns IOU_OK; actual result is set via io_req_set_res().
+ */
 int io_statx(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_statx *sx = io_kiocb_to_cmd(req, struct io_statx);
@@ -62,6 +72,10 @@ int io_statx(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_statx_cleanup - Clean up resources after statx operation.
+ * Frees the filename structure allocated during prep.
+ */
 void io_statx_cleanup(struct io_kiocb *req)
 {
 	struct io_statx *sx = io_kiocb_to_cmd(req, struct io_statx);

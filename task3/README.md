@@ -43,15 +43,22 @@
 |               |            |                                                                       |io_uring_cmd_issue     | uring_cmd.c |function parameter|
 |               |            |                                                                       |io_uring_cmd_complete  | uring_cmd.c |function parameter|
 
-
+### waitid.c
+| Structure name | Defined In     | Attributes                                                | Caller Function Source | Source Caller  | Usage              |
 |----------------|----------------|-----------------------------------------------------------|------------------------|----------------|--------------------|
 | io_waitid      | waitid.c       | idtype_t idtype, id_t id, siginfo_t *infop, int options   | io_uring_prep_waitid   | waitid.c       | local variable     |
 |                |                |                                                           | io_waitid_complete     | waitid.c       | function parameter |
+
+### xattr.c
+| Structure name | Defined In     | Attributes                                                | Caller Function Source | Source Caller  | Usage              |
 |----------------|----------------|-----------------------------------------------------------|------------------------|----------------|--------------------|
 | io_xattr       | xattr.c        | const char *name, void *value, size_t size, int flags     | io_uring_prep_getxattr | xattr.c        | local variable     |
 |                |                |                                                           | io_uring_prep_setxattr | xattr.c        | local variable     |
 |                |                |                                                           | io_xattr_complete      | xattr.c        | function parameter |
-|----------------|----------------|-----------------------------------------------------------|------------------------|----------------|--------------------|
-| io_zerocopy    | zcrx.c         | int fd, void *buf, size_t len, unsigned int flags         | io_uring_prep_zerocopy_recv | zcrx.c    | local variable     |
-|                |                |                                                           | io_uring_prep_zerocopy_recv_multi | zcrx.c | local variable |
-|                |                |                                                           | io_zerocopy_complete   | zcrx.c         | function parameter |
+
+### zcrx.c
+| Structure name | Defined In     | Attributes                                         | Caller Function Source            | Source Caller | Usage              |
+|----------------|----------------|----------------------------------------------------|-----------------------------------|---------------|--------------------|
+| io_zerocopy    | zcrx.c         | int fd, void *buf, size_t len, unsigned int flags  | io_uring_prep_zerocopy_recv       | zcrx.c        | local variable     |
+|                |                |                                                    | io_uring_prep_zerocopy_recv_multi | zcrx.c        | local variable     |
+|                |                |                                                    | io_zerocopy_complete              | zcrx.c        | function parameter |

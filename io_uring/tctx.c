@@ -12,6 +12,11 @@
 #include "io_uring.h"
 #include "tctx.h"
 
+/**
+ * io_init_wq_offload - Initialize workqueue for offloaded task.
+ * Sets up a hash map if not present, prepares workqueue data,
+ * and creates the workqueue with limited concurrency. Returns pointer or error.
+ */
 static struct io_wq *io_init_wq_offload(struct io_ring_ctx *ctx,
 					struct task_struct *task)
 {
@@ -44,6 +49,11 @@ static struct io_wq *io_init_wq_offload(struct io_ring_ctx *ctx,
 	return io_wq_create(concurrency, &data);
 }
 
+/**
+ * __io_uring_free - Free task-specific io_uring context.
+ * Destroys inflight counter, checks for leftover nodes (warns if any),
+ * and frees the tctx structure.
+ */
 void __io_uring_free(struct task_struct *tsk)
 {
 	struct io_uring_task *tctx = tsk->io_uring;
@@ -68,6 +78,11 @@ void __io_uring_free(struct task_struct *tsk)
 	tsk->io_uring = NULL;
 }
 
+/**
+ * io_uring_alloc_task_context - Allocate and init task-specific context.
+ * Allocates memory, initializes inflight counter, sets up workqueue.
+ * Returns 0 on success or error code on failure.
+ */
 __cold int io_uring_alloc_task_context(struct task_struct *task,
 				       struct io_ring_ctx *ctx)
 {
@@ -103,6 +118,11 @@ __cold int io_uring_alloc_task_context(struct task_struct *task,
 	return 0;
 }
 
+/**
+ * __io_uring_add_tctx_node - Add task-context mapping for given ring.
+ * Ensures task has a valid tctx, allocates new node if needed,
+ * adds it to both xarray and ctx list. Returns 0 or error.
+ */
 int __io_uring_add_tctx_node(struct io_ring_ctx *ctx)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -145,6 +165,11 @@ int __io_uring_add_tctx_node(struct io_ring_ctx *ctx)
 	return 0;
 }
 
+/**
+ * __io_uring_add_tctx_node_from_submit - Variant that enforces single issuer.
+ * Checks submitter task if setup flag is set, then calls main add function.
+ * Returns 0 or error.
+ */
 int __io_uring_add_tctx_node_from_submit(struct io_ring_ctx *ctx)
 {
 	int ret;
@@ -162,7 +187,11 @@ int __io_uring_add_tctx_node_from_submit(struct io_ring_ctx *ctx)
 }
 
 /*
- * Remove this io_uring_file -> task mapping.
+ * Remove this io_uring_file -> task mapping. (This one is written before i made a change)
+ */
+ /**
+ * io_uring_del_tctx_node - Remove and free a tctx node.
+ * Looks up and removes the node from xarray and ctx list, then frees it.
  */
 __cold void io_uring_del_tctx_node(unsigned long index)
 {
@@ -187,6 +216,10 @@ __cold void io_uring_del_tctx_node(unsigned long index)
 	kfree(node);
 }
 
+/**
+ * io_uring_clean_tctx - Clean up all tctx resources.
+ * Removes all nodes and exits the workqueue. Called during cleanup.
+ */
 __cold void io_uring_clean_tctx(struct io_uring_task *tctx)
 {
 	struct io_wq *wq = tctx->io_wq;
@@ -207,6 +240,10 @@ __cold void io_uring_clean_tctx(struct io_uring_task *tctx)
 	}
 }
 
+/**
+ * io_uring_unreg_ringfd - Unregister all registered ringfds for current task.
+ * Drops references on all stored files and clears them.
+ */
 void io_uring_unreg_ringfd(void)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -220,6 +257,10 @@ void io_uring_unreg_ringfd(void)
 	}
 }
 
+/**
+ * io_ring_add_registered_file - Store a file in registered rings array.
+ * Finds first empty slot between start and end, returns index or error.
+ */
 int io_ring_add_registered_file(struct io_uring_task *tctx, struct file *file,
 				     int start, int end)
 {
@@ -235,6 +276,11 @@ int io_ring_add_registered_file(struct io_uring_task *tctx, struct file *file,
 	return -EBUSY;
 }
 
+/**
+ * io_ring_add_registered_fd - Get file ref and store in registered rings.
+ * Validates FD and type, then adds to ring using helper function.
+ * Returns index or error.
+ */
 static int io_ring_add_registered_fd(struct io_uring_task *tctx, int fd,
 				     int start, int end)
 {
@@ -261,6 +307,13 @@ static int io_ring_add_registered_fd(struct io_uring_task *tctx, int fd,
  * index. If no index is desired, application may set ->offset == -1U
  * and we'll find an available index. Returns number of entries
  * successfully processed, or < 0 on error if none were processed.
+ * this one already written before i made a change
+ */
+
+ /**
+ * io_ringfd_register - Register one or more ring fds for fast path use.
+ * Adds user-provided ring fds to current task’s registered_rings array.
+ * Returns number of successfully processed entries or error.
  */
 int io_ringfd_register(struct io_ring_ctx *ctx, void __user *__arg,
 		       unsigned nr_args)
@@ -321,6 +374,11 @@ int io_ringfd_register(struct io_ring_ctx *ctx, void __user *__arg,
 	return i ? i : ret;
 }
 
+/**
+ * io_ringfd_unregister - Unregister previously registered ring fds.
+ * Clears entries in registered_rings array for the current task.
+ * Returns number of processed entries or error.
+ */
 int io_ringfd_unregister(struct io_ring_ctx *ctx, void __user *__arg,
 			 unsigned nr_args)
 {

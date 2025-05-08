@@ -22,6 +22,11 @@ struct io_sync {
 	int				mode;
 };
 
+/**
+ * io_sfr_prep - Prepare a sync_file_range request.
+ * Validates SQE input, extracts offset, length, and flags.
+ * Forces async execution mode. Returns 0 on success or error.
+ */
 int io_sfr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);
@@ -37,6 +42,11 @@ int io_sfr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_sync_file_range - Execute sync_file_range() asynchronously.
+ * Performs file range sync using prepped parameters.
+ * Always completes synchronously; returns result via io_req_set_res().
+ */
 int io_sync_file_range(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);
@@ -50,6 +60,12 @@ int io_sync_file_range(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_fsync_prep - Prepare an fsync request.
+ * Validates input flags and extracts offset/length.
+ * Only IORING_FSYNC_DATASYNC flag is allowed.
+ * Forces async execution mode.
+ */
 int io_fsync_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);
@@ -67,6 +83,11 @@ int io_fsync_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_fsync - Execute vfs_fsync_range() asynchronously.
+ * Uses file and prepped flags to flush data/metadata to disk.
+ * Always runs in blocking context; returns result via io_req_set_res().
+ */
 int io_fsync(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);
@@ -82,6 +103,11 @@ int io_fsync(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_fallocate_prep - Prepare a fallocate request.
+ * Validates SQE input, extracts offset, length, and mode.
+ * Forces async execution mode. Returns 0 on success or error.
+ */
 int io_fallocate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);
@@ -96,6 +122,11 @@ int io_fallocate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_fallocate - Execute vfs_fallocate() asynchronously.
+ * Applies prepped mode, offset, and length to the file.
+ * Triggers fsnotify on success. Returns result via io_req_set_res().
+ */
 int io_fallocate(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_sync *sync = io_kiocb_to_cmd(req, struct io_sync);

@@ -1,4 +1,6 @@
 ## Sources
+
+//Ryan
 ### advise.c
 Store io_madvice & io_fadvice structures, both have the same exact attributes. Which make them basically the same thing. Except function body treat them as separate. Codes which make use of io_madvice are guarded by compilation macro, which make its relevant functions only active if the build flag is set. But functions that make use of io_fadvice are active all the time. The exact difference between io_madvice & io_fadvice will only known after exploring do_madvise function for io_madvice & vfs_fadvise function for io_fadvice.
 
@@ -133,6 +135,13 @@ This file declares the function prototypes defined at fs.c.
 ### futex.h
 This file declares the interface for futex operations in futex.c.
 
+<<<<<<< HEAD
+=======
+//Agas
+### io_uring.c
+Implements the core functionality of io_uring, including the management of submission and completion queues. It handles memory allocation, initialization, and cleanup of ring buffers. This file also defines the main logic for processing I/O requests.
+
+>>>>>>> 1a1a760 (baru)
 ### io_uring.h
 Declares the core data structures and functions used in io_uring, including submission queue entries (SQE) and completion queue entries (CQE). It provides the interface for managing ring buffers and interacting with io_uring operations.
 

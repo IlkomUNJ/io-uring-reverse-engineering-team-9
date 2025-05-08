@@ -106,21 +106,56 @@ sqpoll.c
 sqpoll.h
 
 //Danar
-statx.c
-statx.h
-sync.c
-sync.h
-tctx.c
-tctx.h
-timeout.c
-timeout.h
-truncate.c
-truncate.h
-uring_cmd.c
-uring_cmd.h
-waitid.c
-waitid.h
-xattr.c
-xattr.h
-zcrx.c
-zcrx.h
+## statx.c
+This file contains the implementation logic for submitting asynchronous statx() system calls using the io_uring interface. The statx() syscall is used to retrieve metadata about a file or directory, such as its size, type, permissions, timestamps, and other attributes. In this file, you'll find code that prepares the request, submits it to the io_uring submission queue, and handles any internal data structures required to track the operation until completion.
+
+## statx.h
+This header file declares the function prototypes, macros, and data structures needed by other parts of liburing or user applications to use the async statx() functionality. It typically includes declarations for functions like io_uring_prep_statx() and io_uring_submit_statx(), along with necessary flags and struct definitions that are shared across modules.
+
+## sync.c
+This file implements support for asynchronous synchronization operations such as fsync() and fdatasync() using io_uring. These operations ensure that changes made to files (like writes) are safely flushed to disk. The code here manages the setup and submission of these I/O operations into the io_uring ring, allowing applications to perform sync operations without blocking the main thread.
+
+## sync.h
+This header defines the public API for using async fsync and fdatasync operations. It includes function declarations like io_uring_prep_fsync() and io_uring_prep_fdatasync(), which are used when preparing requests, and may also define relevant flags and helper macros.
+
+## tctx.c
+This file handles the management of thread-local context (often abbreviated as "tctx") within liburing. Thread context is essential in multi-threaded programs to manage resources specific to each thread, such as private memory, state tracking, and cleanup routines. This file ensures proper initialization, usage, and cleanup of per-thread data to avoid conflicts and improve performance in threaded applications.
+
+## tctx.h
+The header file exposes internal structures and function declarations related to thread context handling. It allows other components of liburing to access and manipulate thread-specific data structures safely and efficiently.
+
+## timeout.c
+This file provides the implementation for setting up timeout-based operations using io_uring. It supports the IORING_OP_TIMEOUT opcode, which allows users to set time limits on waiting for completions or other events. This is useful for implementing cancellable waits or enforcing deadlines on I/O operations.
+
+## timeout.h
+This header file declares the interfaces needed to work with timeouts via io_uring, including function prototypes for preparing and submitting timeout requests, as well as definitions for timeout-related flags and structures.
+
+## truncate.c
+Implements support for asynchronous file truncation through io_uring. File truncation involves changing the size of a file, often to zero length, and is commonly used during file resets or cleanups. This file handles the preparation and submission of truncate requests so they can be executed non-blockingly.
+
+## truncate.h
+Declares the APIs and helper functions needed to initiate truncate operations asynchronously. It includes declarations for functions like io_uring_prep_truncate() and io_uring_prep_ftruncate().
+
+## uring_cmd.c
+This file implements support for submitting custom passthrough commands directly to the kernel using io_uring, typically via the IORING_OP_URING_CMD opcode. This feature is especially useful for devices like NVMe SSDs that support vendor-specific commands, enabling advanced device control from user space.
+
+## uring_cmd.h
+Exposes the function prototypes and data structures required to use uring command passthrough, including definitions for the io_uring_cmd structure and helpers for initializing and submitting custom commands.
+
+## waitid.c
+Implements asynchronous process status monitoring using the waitid() system call via io_uring. This allows applications to wait for child processes to change state (e.g., exit, stop, continue) without blocking. The file handles submission and processing of such wait requests in an event-driven manner.
+
+## waitid.h
+Declares the function signatures and related types needed to use async waitid() functionality, such as io_uring_prep_waitid(). It may also include constants and flags associated with process state monitoring.
+
+## xattr.c
+Implements support for asynchronous extended attribute (xattr) operations using io_uring. Extended attributes allow associating metadata (like security labels or custom tags) with files. This file handles asynchronous versions of getxattr, setxattr, removexattr, and similar operations.
+
+## xattr.h
+Declares the APIs and helper functions for working with xattrs asynchronously. It includes function prototypes like io_uring_prep_getxattr() and io_uring_prep_setxattr(), along with definitions of flags and structures used in xattr handling.
+
+## zcrx.c
+Implements zero-copy receive (ZCRX) functionality using io_uring, designed to optimize network or I/O receive operations by eliminating unnecessary memory copies between kernel and user space. This improves performance, especially in high-throughput scenarios like networking or large file transfers.
+
+## zcrx.h
+Declares the APIs, structures, and flags required to configure and use zero-copy receive features. It provides interfaces for developers to enable ZCRX and interact with it programmatically.

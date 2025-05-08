@@ -8,27 +8,54 @@ This file creates, init, and free memory cache.
 ### cancel.c
 This file handles cancelling asynchronous operations. It store io_cancel structure that have attribute *file, addr, flags, fd, opcode. It also define a macro CANCEL_FLAGS which is a combination bitwise OR of several flags.
 
+### epoll.c
+This file implements io_uring support for epoll operation. It store io_epoll and io_epoll_wait structures, both store file and epoll_event struct. The function io_epoll_ctl_prep() and io_epoll_ctl() prepare and execute epoll control operation such as add, modify, and remove file descriptor. The function io_epoll_wait_prep() and io_epoll_wait prepare and execute event polling via epoll. The prep function extracts parameters such as the maximum number of events and the user event buffer. The main function calls epoll_sendevents() to deliver events, return -EAGAIN if no event are available.
+
+### eventfd.c
+This file implements eventfd support for io_uring, enabling  efficient notification of io_uring completion events. It manages the registration, signaling, and unregistration of eventfd objects. It store io_ev_fd structure that store the eventfd context (eventfd_ctx), reference counters (refcount_t), and state. Functions in this file handle acquiring and releasing eventfd references, signaling the eventfd when events occur, and ensuring correct behavior for both synchronous and asynchronous notification modes.
+
+### fdinfo.c
+This file provides the code for displaying detailed state information about io_uring file descriptors, but only compiled if the CONFIG_PROC_FS flag is enabled. The main function is io_uring_show_fdinfo() which output statistics and configuration for an io_uring instance.
+
+### filetable.c
+This file manages a table of files for io_uring. It handles adding and removing files from the table, and keep track which spots are free or used using a bitmap. The main functions include io_alloc_file_tables() and io_free_file_tables() for creating and freeing the table, io_file_bitmap_get() for finding a free slot, and io_install_fixed_file(), __io_fixed_fd_install(), and io_fixed_fd_install() for adding files to the table, and io_fixed_fd_remove() and io_register_file_alloc_range() to remove a file.
+
+### fs.c
+It store io_rename, io_unlink, io_mkdir, and io_link structures. Io_rename and io_link have same attributes. Functions that have '*_prep' like io_renameat_prep, is used for validate inputs and setup structures. Main functions like io_renameat execute the actual file operation. '*_cleanup' functions free resources.
+
+### futex.c
+It store io_futex and io_futex_data structures. Main functions are `io_futex_wait()` for single futex waiting, `io_futex_wake()` for waking up waiters, and `io_futexv_wait()` for waiting on multiple futexes simultaneously. The code uses constants like `FUTEX2_VALID_MASK` for validation and macros such as `FLAGS_STRICT` to control behavior. Helper functions `io_futex_wake_fn()` and `io_futexv_wake_fn()` serve as callbacks when futexes are triggered. Resource management is handled through `io_futex_cache_init()` and `io_futex_cache_free()`, with a constant `IO_FUTEX_ALLOC_CACHE_MAX` defining the maximum cache size. For cancellation, `io_futex_cancel()` and `io_futex_remove_all()` properly clean up pending operations. All operations follow io_uring's pattern with preparation functions like `io_futex_prep()` validating inputs before execution.
+
 ## Headers
 ### advise.h
 Just declare the function specification
 
 ### alloc_cache.h
-Define a constant IO_ALLOC_CACHE_MAX to set maximum cache size. It also declares and defines helper function for memory cache system.
+Define a constant IO_ALLOC_CACHE_MAX to set maximum cache size to 128. It also declares and defines helper function to allocate, free, and cache memory objects. There is CONFIG_KASAN flag in *io_alloc_cache_get that if it is enabled, the function will always clear the initial bytes that must be zeroed post alloc, in case any of them overlap with KASAN storage.
+
+### cancel.h
+Store io_cancel_data structure that also store another structure (io_ring_ctx). It represents information needed to identify which request to cancel. This file also defines interfaces for cancelling submitted but not yet compiled I/O operations.
+
+### epoll.h
+It declares the io_uring epoll operation interfaces, which are only available when the flag CONFIG_EPOLL is enabled. It provides function prototypes for preparing and executing asynchronous epoll control io_epoll_ctl_prep(), io_epoll_ctl() and epoll wait io_epoll_wait_prep(), io_epoll_wait() operations via io_uring.
+
+### eventfd.h
+It defines the interface for integrating eventfd notifications with io_uring. It provides functions for registering and unregistering an eventfd. Tt also declares functions to trigger eventfd notifications manually or to flush them in accordance with the current state of the completion queue.
+
+### fdinfo.h
+It declares the io_uring_show_fdinfo() function which defined in fdinfo.c
+
+### filetable.h
+It declares filetable.c main functions. There are inline functions such as io_file_bitmap_clear, io_file_bitmap_set, io_slot_flags, io_slot_file, io_fixed_file_set, and io_file_table_set_alloc_range to handle bitmap operations, retrieve files from resource nodes, and encode or decode slot flags. There is also macros FFS_NOWAIT, FFS_ISREG, and FFS_MASK.
+
+### fs.h
+This file declares the function prototypes defined at fs.c.
+
+
+### futex.h
+This file declares the interface for futex operations in futex.c.
 
 //Ryan
-cancel.h
-epoll.c
-epoll.h
-eventfd.c
-eventfd.h
-fdinfo.c
-fdinfo.h
-filetable.c
-filetable.h
-fs.c
-fs.h
-futex.c
-futex.h
 
 //Agas
 ### io_uring.c

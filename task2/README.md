@@ -308,5 +308,180 @@
 | include/linux/uaccess.h            | include/linux/uaccess.h            | copy_from_user                 | 1          |
 | include/linux/uaccess.h            | include/linux/uaccess.h            | copy_to_user                   | 1          |
 
+### statx.c
 
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| statx.c                            | statx.c                            | io_uring_prep_statx            | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
+|                                    | string.h                           | memset                         | 1          |
 
+### statx.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| statx.h                            | statx.h                            | io_uring_prep_statx            | 1          |
+|                                    | statx.h                            | io_uring_submit_statx          | 1          |
+
+### sync.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| sync.c                             | sync.c                             | io_uring_prep_fsync            | 1          |
+|                                    | sync.c                             | io_uring_prep_fdatasync        | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->flags                     | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### sync.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| sync.h                             | sync.h                             | io_uring_prep_fsync            | 1          |
+|                                    | sync.h                             | io_uring_prep_fdatasync        | 1          |
+|                                    | sync.h                             | io_uring_submit_fsync          | 1          |
+
+### tctx.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| tctx.c                             | tctx.c                             | io_uring_tctx_get              | 1          |
+|                                    | tctx.c                             | io_uring_tctx_put              | 1          |
+|                                    | linux/sched/task.h                 | get_task_struct                | 1          |
+|                                    | linux/sched/task.h                 | put_task_struct                | 1          |
+|                                    | linux/slab.h                       | kmem_cache_alloc               | 1          |
+|                                    | linux/slab.h                       | kmem_cache_free                | 1          |
+|                                    | kernel/rcu/tree.c                  | call_rcu                       | 1          |
+
+### tctx.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| tctx.h                             | tctx.h                             | io_uring_tctx_get              | 1          |
+|                                    | tctx.h                             | io_uring_tctx_put              | 1          |
+
+### timeout.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| timeout.c                          | timeout.c                          | io_uring_prep_timeout          | 1          |
+|                                    | timeout.c                          | io_uring_prep_timeout_remove   | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### timeout.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| timeout.h                          | timeout.h                          | io_uring_prep_timeout          | 1          |
+|                                    | timeout.h                          | io_uring_prep_timeout_remove   | 1          |
+|                                    | timeout.h                          | io_uring_submit_timeout        | 1          |
+
+### truncate.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| truncate.c                         | truncate.c                         | io_uring_prep_truncate         | 1          |
+|                                    | truncate.c                         | io_uring_prep_ftruncate        | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### truncate.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| truncate.h                         | truncate.h                         | io_uring_prep_truncate         | 1          |
+|                                    | truncate.h                         | io_uring_prep_ftruncate        | 1          |
+|                                    | truncate.h                         | io_uring_submit_truncate       | 1          |
+
+### uring_cmd.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| uring_cmd.c                        | uring_cmd.c                        | io_uring_prep_uring_cmd        | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### uring_cmd.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| uring_cmd.h                        | uring_cmd.h                        | io_uring_prep_uring_cmd        | 1          |
+|                                    | uring_cmd.h                        | io_uring_submit_uring_cmd      | 1          |
+
+### waitid.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| waitid.c                           | waitid.c                           | io_uring_prep_waitid           | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### waitid.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| waitid.h                           | waitid.h                           | io_uring_prep_waitid           | 1          |
+|                                    | waitid.h                           | io_uring_submit_waitid         | 1          |
+
+### xattr.c
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| xattr.c                            | xattr.c                            | io_uring_prep_getxattr         | 1          |
+|                                    | xattr.c                            | io_uring_prep_setxattr         | 1          |
+|                                    | xattr.c                            | io_uring_prep_removexattr      | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
+|                                    | string.h                           | memset                         | 1          |
+
+### xattr.h
+
+| Source File                        | Library/Header                     | Function/Struct                | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| xattr.h                            | xattr.h                            | io_uring_prep_getxattr         | 1          |
+|                                    | xattr.h                            | io_uring_prep_setxattr         | 1          |
+|                                    | xattr.h                            | io_uring_prep_removexattr      | 1          |
+|                                    | xattr.h                            | io_uring_submit_getxattr       | 1          |
+
+### zcrx.c
+
+| Source File                        | Library/Header                     | Function/Struct                   | Times Used |
+|------------------------------------|------------------------------------|-----------------------------------|------------|
+| zcrx.c                             | zcrx.c                             | io_uring_prep_zerocopy_recv       | 1          |
+|                                    | zcrx.c                             | io_uring_prep_zerocopy_recv_multi | 1          |
+|                                    | io_uring/io_uring.c                | io_uring_get_sqe                  | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->opcode                       | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->fd                           | 1          |
+|                                    | uapi/linux/io_uring.h              | sqe->addr                         | 1          |
+|                                    | string.h                           | memset                            | 1          |
+
+### zcrx.h
+
+| Source File                        | Library/Header                     | Function/Struct                   | Times Used |
+|------------------------------------|------------------------------------|-----------------------------------|------------|
+| zcrx.h                             | zcrx.h                             | io_uring_prep_zerocopy_recv       | 1          |
+|                                    | zcrx.h                             | io_uring_prep_zerocopy_recv_multi | 1          |
+|                                    | zcrx.h                             | io_uring_submit_zerocopy_recv     | 1          |

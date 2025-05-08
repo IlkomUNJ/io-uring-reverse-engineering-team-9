@@ -86,24 +86,59 @@ Handles completion notifications for io_uring operations. It manages how events 
 Declares functions and structures for handling completion notifications in io_uring. It provides the interface for sending events back to user space after operations are completed.
 
 //Darrell
-opdef.c
-opdef.h
-openclose.c
-openclose.h
-poll.c
-poll.h
-refs.h
-register.c
-register.h
-rsrc.c
-rsrc.h
-rw.c
-rw.h
-slist.h
-splice.c
-splice.h
-sqpoll.c
-sqpoll.h
+### opdef.c
+This file defines and manages the operation handling table for io_uring. It maps each supported operation (opcode) to its corresponding preparation, execution, and cleanup logic.
+
+### opdef.h
+This header file defines the structure and interfaces for managing io_uring operations (opcodes). It provides the blueprint for how each operation is handled, including its preparation, execution, and cleanup.
+
+### openclose.c
+This file implements the open and close operations for io_uring. It provides the logic for handling file-related system calls, such as opening, closing, and managing file descriptors, within the io_uring framework.
+
+### openclose.h
+This header file declares the interfaces for handling file open and close operations in io_uring. It provides function prototypes for preparing, executing, and cleaning up open/close requests, as well as managing fixed file descriptors.
+
+### poll.c
+This file implements the polling operations for io_uring, enabling efficient monitoring of file descriptors for readiness (e.g., for reading or writing). It handles the IORING_OP_POLL_ADD and IORING_OP_POLL_REMOVE opcodes, which allow applications to asynchronously wait for events on file descriptors.
+
+### poll.h
+This header file declares the structures and functions used for implementing polling operations in io_uring. It provides the necessary definitions for managing poll requests, handling events, and integrating polling into the io_uring framework.
+
+### refs.h
+This file provides utilities for reference counting in io_uring, specifically for managing the lifecycle of io_kiocb (I/O kernel control block) objects. Reference counting ensures that requests are not prematurely freed or accessed after being released.
+
+### register.c
+This file implements the logic for the io_uring_register() syscall, which allows applications to register or unregister resources and configurations with an io_uring instance. It handles various registration-related operations to optimize performance and enable advanced features.
+
+### register.h
+This header file declares the interfaces for resource registration and unregistration in io_uring. It provides function prototypes used in the implementation of the io_uring_register() syscall.
+
+### rsrc.c
+This file implements the management of resources (e.g., files, buffers, memory) for io_uring. It handles the registration, updating, and unregistration of resources, ensuring efficient and safe access to these resources during asynchronous I/O operations.
+
+### rsrc.h
+This header file declares the structures, constants, and functions used for managing resources (e.g., files, buffers, memory) in io_uring. It provides the interface for registering, updating, and managing resources efficiently.
+
+### rw.c
+This file implements the read and write operations for io_uring, handling both synchronous and asynchronous I/O requests. It supports various read/write modes, including vectored I/O, fixed buffers, and multishot reads.
+
+### rw.h
+This header file declares the structures and functions used for implementing read and write operations in io_uring. It provides the interface for preparing, executing, and managing various types of I/O requests, including regular, fixed, and multishot reads/writes.
+
+### slist.h
+This file provides utility functions and macros for managing singly linked lists and stacks in the io_uring framework. It is primarily used for managing work queues (io_wq_work_list) and work nodes (io_wq_work_node) in an efficient and thread-safe manner.
+
+### splice.c
+This file implements the splice and tee operations for io_uring, which allow efficient data transfer between file descriptors without copying data to user space. These operations are useful for high-performance I/O scenarios, such as streaming or piping data between files or sockets.
+
+### splice.h
+This header file declares the interfaces for implementing splice and tee operations in io_uring. These operations enable efficient, zero-copy data transfers between file descriptors.
+
+### sqpoll.c
+This file implements the submission queue polling (SQPOLL) feature for io_uring, which offloads submission queue processing to a dedicated kernel thread. This feature improves performance by reducing the overhead of system calls for applications that frequently submit I/O requests.
+
+### sqpoll.h
+This header file declares the structures and functions used for implementing submission queue polling (SQPOLL) in io_uring. It provides the interface for managing the kernel thread responsible for polling the submission queue (SQ) and processing I/O requests.
 
 //Danar
 ## statx.c

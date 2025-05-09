@@ -226,6 +226,72 @@
 | futex.h               | -                             | -                                      | -           |
 
 
+// Darrell
+### opdef.c
+
+| Source File                        | Library/Header                     | Function                      | Times Used |
+|------------------------------------|------------------------------------|-------------------------------|------------|
+| opdef.c                            | <linux/kernel.h>                   | WARN_ON_ONCE                  | 3          |
+|                                    | <linux/errno.h>                    | -ECANCELED, -EOPNOTSUPP       | 2          |
+|                                    | <linux/io_uring.h>                 | io_uring_get_opcode           | 1          |
+|                                    | <linux/io_uring.h>                 | io_uring_op_supported         | 1          |
+|                                    | <linux/io_uring.h>                 | io_uring_optable_init         | 1          |
+|                                    | <linux/io_uring/cmd.h>             | io_uring_cmd                  | 1          |
+|                                    | "io_uring.h"                       | io_prep_readv, io_read        | Multiple   |
+|                                    | "opdef.h"                          | io_issue_defs                 | 1          |
+|                                    | "refs.h"                           | -                             | 0          |
+|                                    | "tctx.h"                           | -                             | 0          |
+|                                    | "sqpoll.h"                         | -                             | 0          |
+|                                    | "fdinfo.h"                         | -                             | 0          |
+|                                    | "kbuf.h"                           | -                             | 0          |
+|                                    | "rsrc.h"                           | -                             | 0          |
+|                                    | "xattr.h"                          | io_fsetxattr_prep             | 1          |
+|                                    | "nop.h"                            | io_nop_prep, io_nop           | 1          |
+|                                    | "fs.h"                             | io_fsync_prep, io_fsync       | 1          |
+|                                    | "splice.h"                         | io_splice_prep, io_splice     | 1          |
+|                                    | "sync.h"                           | io_sfr_prep                   | 1          |
+|                                    | "advise.h"                         | io_fadvise_prep               | 1          |
+|                                    | "openclose.h"                      | io_openat_prep, io_close      | 1          |
+|                                    | "uring_cmd.h"                      | io_uring_cmd_prep             | 1          |
+|                                    | "epoll.h"                          | io_epoll_ctl_prep             | 1          |
+|                                    | "statx.h"                          | io_statx_prep                 | 1          |
+|                                    | "net.h"                            | io_sendmsg_prep               | 1          |
+|                                    | "msg_ring.h"                       | io_msg_ring_prep              | 1          |
+|                                    | "timeout.h"                        | io_timeout_prep               | 1          |
+|                                    | "poll.h"                           | io_poll_add_prep              | 1          |
+|                                    | "cancel.h"                         | io_async_cancel_prep          | 1          |
+|                                    | "rw.h"                             | io_prep_write                 | 1          |
+|                                    | "waitid.h"                         | io_waitid_prep                | 1          |
+|                                    | "futex.h"                          | io_futex_prep                 | 1          |
+|                                    | "truncate.h"                       | io_ftruncate_prep             | 1          |
+|                                    | "zcrx.h"                           | io_send_zc_prep               | 1          |
+
+### opdef.h
+
+| Source File                        | Library/Header                     | Function                       | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| opdef.h                            | -                                  | io_issue_defs                  | 1          |
+|                                    | -                                  | io_cold_defs                   | 1          |
+|                                    | -                                  | io_uring_op_supported          | 1          |
+|                                    | -                                  | io_uring_optable_init          | 1          |
+
+### openclose.c
+
+| Source File                        | Library/Header                     | Function                       | Times Used |
+|------------------------------------|------------------------------------|--------------------------------|------------|
+| openclose.c                        | <linux/kernel.h>                   | WARN_ON_ONCE                   | 1          |
+|                                    | <linux/errno.h>                    | -EINVAL, -EBADF, -EPERM        | Multiple   |
+|                                    | <linux/fs.h>                       | filp_close, do_filp_open       | 2          |
+|                                    | <linux/file.h>                     | fd_install, put_unused_fd      | 2          |
+|                                    | <linux/fdtable.h>                  | __get_unused_fd_flags          | 1          |
+|                                    | <linux/fsnotify.h>                 | -                              | 0          |
+|                                    | <linux/namei.h>                    | build_open_flags               | 1          |
+|                                    | <linux/io_uring.h>                 | io_req_set_res, req_set_fail   | Multiple   |
+|                                    | <uapi/linux/io_uring.h>            | -                              | 0          |
+|                                    | "../fs/internal.h"                 | -                              | 0          |
+|                                    | "io_uring.h"                       | io_kiocb_to_cmd                | Multiple   |
+|                                    | "rsrc.h"                           | -                              | 0          |
+|                                    | "openclose.h"                      | io_openat_prep, io_close       | Multiple   |
 
 // Agastya Dava Nurrahman
 ### io_uring.c

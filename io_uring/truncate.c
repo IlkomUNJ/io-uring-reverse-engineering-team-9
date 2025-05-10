@@ -20,6 +20,11 @@ struct io_ftrunc {
 	loff_t				len;
 };
 
+/**
+ * io_ftruncate_prep - Prepare an async ftruncate request.
+ * Validates SQE input, extracts truncate length from 'off' field.
+ * Forces async execution mode. Returns 0 on success or error.
+ */
 int io_ftruncate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_ftrunc *ft = io_kiocb_to_cmd(req, struct io_ftrunc);
@@ -34,6 +39,11 @@ int io_ftruncate_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_ftruncate - Execute the actual ftruncate operation.
+ * Calls do_ftruncate() with prepped length.
+ * Always runs in blocking context; sets result via io_req_set_res().
+ */
 int io_ftruncate(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_ftrunc *ft = io_kiocb_to_cmd(req, struct io_ftrunc);

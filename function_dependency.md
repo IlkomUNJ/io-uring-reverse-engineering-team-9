@@ -10,4 +10,4 @@ alloc_cache.h | /include/linux/kasan.h | kasan_mempool_unpoison_object | 1
 | | alloc_cache.h | io_alloc_cache_put | 1
 | | linux/mm/slub.c | kfree | 1
 
-Continue with the list untill all functions used in each source are listed.
+Continue with the list until all functions used in each source are listed.

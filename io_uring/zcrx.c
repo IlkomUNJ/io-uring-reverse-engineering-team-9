@@ -28,6 +28,10 @@
 
 #define IO_DMA_ATTR (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
 
+/**
+ * __io_zcrx_unmap_area - Unmap DMA pages after use.
+ * Performs dma_unmap_page_attrs() on mapped entries.
+ */
 static void __io_zcrx_unmap_area(struct io_zcrx_ifq *ifq,
 				 struct io_zcrx_area *area, int nr_mapped)
 {
@@ -44,12 +48,21 @@ static void __io_zcrx_unmap_area(struct io_zcrx_ifq *ifq,
 	}
 }
 
+/**
+ * io_zcrx_unmap_area - Wrapper to unmap area if mapped.
+ * Checks if area is mapped before calling __io_zcrx_unmap_area().
+ */
 static void io_zcrx_unmap_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
 {
 	if (area->is_mapped)
 		__io_zcrx_unmap_area(ifq, area, area->nia.num_niovs);
 }
 
+/**
+ * io_zcrx_map_area - Maps area pages for DMA.
+ * Sets up DMA addresses for each page in the area.
+ * Returns 0 or error if mapping fails.
+ */
 static int io_zcrx_map_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
 {
 	int i;
@@ -78,6 +91,10 @@ static int io_zcrx_map_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
 	return 0;
 }
 
+/**
+ * io_zcrx_sync_for_device - Sync DMA buffer for device access.
+ * Used when page pool requires explicit cache sync.
+ */
 static void io_zcrx_sync_for_device(const struct page_pool *pool,
 				    struct net_iov *niov)
 {
@@ -97,6 +114,10 @@ static void io_zcrx_sync_for_device(const struct page_pool *pool,
 
 #define IO_SKBS_PER_CALL_LIMIT	20
 
+/**
+ * struct io_zcrx_args - Context for skb receive operation.
+ * Holds request, ifq, sock, and count of processed SKBs.
+ */
 struct io_zcrx_args {
 	struct io_kiocb		*req;
 	struct io_zcrx_ifq	*ifq;
@@ -106,6 +127,10 @@ struct io_zcrx_args {
 
 static const struct memory_provider_ops io_uring_pp_zc_ops;
 
+/**
+ * io_zcrx_iov_to_area - Convert net_iov to owning io_zcrx_area.
+ * Helps track which area owns a given iov.
+ */
 static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_iov *niov)
 {
 	struct net_iov_area *owner = net_iov_owner(niov);
@@ -113,6 +138,10 @@ static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_iov *nio
 	return container_of(owner, struct io_zcrx_area, nia);
 }
 
+/**
+ * io_get_user_counter - Get atomic counter for user reference tracking.
+ * Returns pointer to area's user_refs array entry.
+ */
 static inline atomic_t *io_get_user_counter(struct net_iov *niov)
 {
 	struct io_zcrx_area *area = io_zcrx_iov_to_area(niov);
@@ -120,6 +149,10 @@ static inline atomic_t *io_get_user_counter(struct net_iov *niov)
 	return &area->user_refs[net_iov_idx(niov)];
 }
 
+/**
+ * io_zcrx_put_niov_uref - Decrements user reference.
+ * Returns true if last reference was dropped.
+ */
 static bool io_zcrx_put_niov_uref(struct net_iov *niov)
 {
 	atomic_t *uref = io_get_user_counter(niov);
@@ -130,11 +163,19 @@ static bool io_zcrx_put_niov_uref(struct net_iov *niov)
 	return true;
 }
 
+/**
+ * io_zcrx_get_niov_uref - Increments user reference.
+ * Prevents premature recycling while in use.
+ */
 static void io_zcrx_get_niov_uref(struct net_iov *niov)
 {
 	atomic_inc(io_get_user_counter(niov));
 }
 
+/**
+ * io_zcrx_iov_page - Get page backing this net_iov.
+ * Converts net_iov index to corresponding page.
+ */
 static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
 {
 	struct io_zcrx_area *area = io_zcrx_iov_to_area(niov);
@@ -142,6 +183,10 @@ static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
 	return area->pages[net_iov_idx(niov)];
 }
 
+/**
+ * io_allocate_rbuf_ring - Maps ring buffer region for zero-copy RX.
+ * Validates size and maps user-space ring into kernel space.
+ */
 static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
 				 struct io_uring_zcrx_ifq_reg *reg,
 				 struct io_uring_region_desc *rd)
@@ -166,6 +211,10 @@ static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
 	return 0;
 }
 
+/**
+ * io_free_rbuf_ring - Frees previously allocated ring region.
+ * Clears pointers and calls io_free_region().
+ */
 static void io_free_rbuf_ring(struct io_zcrx_ifq *ifq)
 {
 	io_free_region(ifq->ctx, &ifq->ctx->zcrx_region);
@@ -173,6 +222,10 @@ static void io_free_rbuf_ring(struct io_zcrx_ifq *ifq)
 	ifq->rqes = NULL;
 }
 
+/**
+ * io_zcrx_free_area - Frees a zcrx area and its resources.
+ * Unmaps area, frees memory, and releases pages.
+ */
 static void io_zcrx_free_area(struct io_zcrx_area *area)
 {
 	io_zcrx_unmap_area(area->ifq, area);
@@ -187,6 +240,10 @@ static void io_zcrx_free_area(struct io_zcrx_area *area)
 	kfree(area);
 }
 
+/**
+ * io_zcrx_create_area - Creates and initializes a new zcrx area.
+ * Pins user pages, allocates iovs, sets up free list, and tracks users.
+ */
 static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
 			       struct io_zcrx_area **res,
 			       struct io_uring_zcrx_area_reg *area_reg)
@@ -262,6 +319,10 @@ err:
 	return ret;
 }
 
+/**
+ * io_zcrx_ifq_alloc - Allocates interface queue structure.
+ * Initializes locks and sets context reference.
+ */
 static struct io_zcrx_ifq *io_zcrx_ifq_alloc(struct io_ring_ctx *ctx)
 {
 	struct io_zcrx_ifq *ifq;
@@ -277,6 +338,10 @@ static struct io_zcrx_ifq *io_zcrx_ifq_alloc(struct io_ring_ctx *ctx)
 	return ifq;
 }
 
+/**
+ * io_zcrx_drop_netdev - Drops reference to network device.
+ * Ensures netdev_put() is called safely under lock.
+ */
 static void io_zcrx_drop_netdev(struct io_zcrx_ifq *ifq)
 {
 	spin_lock(&ifq->lock);
@@ -287,6 +352,10 @@ static void io_zcrx_drop_netdev(struct io_zcrx_ifq *ifq)
 	spin_unlock(&ifq->lock);
 }
 
+/**
+ * io_close_queue - Closes RX queue and cleans up provider.
+ * Safely shuts down RX queue and puts reference on netdev.
+ */
 static void io_close_queue(struct io_zcrx_ifq *ifq)
 {
 	struct net_device *netdev;
@@ -312,6 +381,10 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
 	ifq->if_rxq = -1;
 }
 
+/**
+ * io_zcrx_ifq_free - Frees interface queue and all associated data.
+ * Calls close_queue, drops netdev, and frees memory.
+ */
 static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
 {
 	io_close_queue(ifq);
@@ -326,6 +399,11 @@ static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
 	kfree(ifq);
 }
 
+/**
+ * io_register_zcrx_ifq - Register an interface queue for zero-copy RX.
+ * Validates permissions, prepares region, allocates queue and area,
+ * maps DMA, opens RX queue, and returns setup info to user.
+ */
 int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
 			  struct io_uring_zcrx_ifq_reg __user *arg)
 {
@@ -421,6 +499,10 @@ err:
 	return ret;
 }
 
+/**
+ * io_unregister_zcrx_ifqs - Unregister and free interface queues.
+ * Called during cleanup, ensures proper freeing of ifq structure.
+ */
 void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
 {
 	struct io_zcrx_ifq *ifq = ctx->ifq;
@@ -434,6 +516,10 @@ void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
 	io_zcrx_ifq_free(ifq);
 }
 
+/**
+ * __io_zcrx_get_free_niov - Get next available niov from area's free list.
+ * Assumes lock is held. Returns pointer or NULL if none available.
+ */
 static struct net_iov *__io_zcrx_get_free_niov(struct io_zcrx_area *area)
 {
 	unsigned niov_idx;
@@ -444,6 +530,10 @@ static struct net_iov *__io_zcrx_get_free_niov(struct io_zcrx_area *area)
 	return &area->nia.niovs[niov_idx];
 }
 
+/**
+ * io_zcrx_return_niov_freelist - Return niov to free list.
+ * Used when buffer is no longer referenced.
+ */
 static void io_zcrx_return_niov_freelist(struct net_iov *niov)
 {
 	struct io_zcrx_area *area = io_zcrx_iov_to_area(niov);
@@ -453,6 +543,10 @@ static void io_zcrx_return_niov_freelist(struct net_iov *niov)
 	spin_unlock_bh(&area->freelist_lock);
 }
 
+/**
+ * io_zcrx_return_niov - Helper to return niov to pool or cache.
+ * Calls freelist helper based on memory provider.
+ */
 static void io_zcrx_return_niov(struct net_iov *niov)
 {
 	netmem_ref netmem = net_iov_to_netmem(niov);
@@ -465,6 +559,10 @@ static void io_zcrx_return_niov(struct net_iov *niov)
 	page_pool_put_unrefed_netmem(niov->pp, netmem, -1, false);
 }
 
+/**
+ * io_zcrx_scrub - Reclaim buffers still held by user space.
+ * Iterates through all niovs and returns any that are no longer referenced.
+ */
 static void io_zcrx_scrub(struct io_zcrx_ifq *ifq)
 {
 	struct io_zcrx_area *area = ifq->area;
@@ -486,6 +584,10 @@ static void io_zcrx_scrub(struct io_zcrx_ifq *ifq)
 	}
 }
 
+/**
+ * io_shutdown_zcrx_ifqs - Scrub and shutdown active zcrx interfaces.
+ * Reclaims buffers still held by user space and closes queue.
+ */
 void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
 {
 	lockdep_assert_held(&ctx->uring_lock);
@@ -496,6 +598,10 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
 	io_close_queue(ctx->ifq);
 }
 
+/**
+ * io_zcrx_rqring_entries - Calculate available RQE entries in ring.
+ * Returns the number of unused RQEs between cached head and tail.
+ */
 static inline u32 io_zcrx_rqring_entries(struct io_zcrx_ifq *ifq)
 {
 	u32 entries;
@@ -504,6 +610,10 @@ static inline u32 io_zcrx_rqring_entries(struct io_zcrx_ifq *ifq)
 	return min(entries, ifq->rq_entries);
 }
 
+/**
+ * io_zcrx_get_rqe - Get next available RQE from ring.
+ * Uses cached head and wraps around based on mask.
+ */
 static struct io_uring_zcrx_rqe *io_zcrx_get_rqe(struct io_zcrx_ifq *ifq,
 						 unsigned mask)
 {
@@ -512,6 +622,10 @@ static struct io_uring_zcrx_rqe *io_zcrx_get_rqe(struct io_zcrx_ifq *ifq,
 	return &ifq->rqes[idx];
 }
 
+/**
+ * io_zcrx_ring_refill - Refills page pool from ring entries.
+ * Attempts to re-arm buffers that were returned to the pool.
+ */
 static void io_zcrx_ring_refill(struct page_pool *pp,
 				struct io_zcrx_ifq *ifq)
 {
@@ -566,6 +680,10 @@ static void io_zcrx_ring_refill(struct page_pool *pp,
 	spin_unlock_bh(&ifq->rq_lock);
 }
 
+/**
+ * io_zcrx_refill_slow - Fallback refill method when fast path is empty.
+ * Uses slow path to refill cache from free list.
+ */
 static void io_zcrx_refill_slow(struct page_pool *pp, struct io_zcrx_ifq *ifq)
 {
 	struct io_zcrx_area *area = ifq->area;
@@ -582,6 +700,10 @@ static void io_zcrx_refill_slow(struct page_pool *pp, struct io_zcrx_ifq *ifq)
 	spin_unlock_bh(&area->freelist_lock);
 }
 
+/**
+ * io_pp_zc_alloc_netmems - Allocate netmems from ring.
+ * Tries to refill from ring first, then fallback pool.
+ */
 static netmem_ref io_pp_zc_alloc_netmems(struct page_pool *pp, gfp_t gfp)
 {
 	struct io_zcrx_ifq *ifq = pp->mp_priv;
@@ -601,6 +723,10 @@ out_return:
 	return pp->alloc.cache[--pp->alloc.count];
 }
 
+/**
+ * io_pp_zc_release_netmem - Release netmem back to ring.
+ * Handles cleanup and returns false to indicate no reuse.
+ */
 static bool io_pp_zc_release_netmem(struct page_pool *pp, netmem_ref netmem)
 {
 	struct net_iov *niov;
@@ -614,6 +740,10 @@ static bool io_pp_zc_release_netmem(struct page_pool *pp, netmem_ref netmem)
 	return false;
 }
 
+/**
+ * io_pp_zc_init - Init hook for page pool memory provider.
+ * Verifies context match and DMA direction.
+ */
 static int io_pp_zc_init(struct page_pool *pp)
 {
 	struct io_zcrx_ifq *ifq = pp->mp_priv;
@@ -633,6 +763,10 @@ static int io_pp_zc_init(struct page_pool *pp)
 	return 0;
 }
 
+/**
+ * io_pp_zc_destroy - Destroy hook for page pool provider.
+ * Puts percpu ref taken at init.
+ */
 static void io_pp_zc_destroy(struct page_pool *pp)
 {
 	struct io_zcrx_ifq *ifq = pp->mp_priv;
@@ -643,6 +777,10 @@ static void io_pp_zc_destroy(struct page_pool *pp)
 	percpu_ref_put(&ifq->ctx->refs);
 }
 
+/**
+ * io_pp_nl_fill - Fill netlink attribute for this queue.
+ * Used for reporting interface info via netlink.
+ */
 static int io_pp_nl_fill(void *mp_priv, struct sk_buff *rsp,
 			 struct netdev_rx_queue *rxq)
 {
@@ -658,6 +796,10 @@ static int io_pp_nl_fill(void *mp_priv, struct sk_buff *rsp,
 	return 0;
 }
 
+/**
+ * io_pp_uninstall - Uninstall provider and clean up.
+ * Drops netdev reference and clears mp_ops.
+ */
 static void io_pp_uninstall(void *mp_priv, struct netdev_rx_queue *rxq)
 {
 	struct pp_memory_provider_params *p = &rxq->mp_params;
@@ -668,6 +810,10 @@ static void io_pp_uninstall(void *mp_priv, struct netdev_rx_queue *rxq)
 	p->mp_priv = NULL;
 }
 
+/**
+ * struct io_uring_pp_zc_ops - Memory provider ops for zcrx.
+ * Defines alloc, release, init, destroy, and nl fill hooks.
+ */
 static const struct memory_provider_ops io_uring_pp_zc_ops = {
 	.alloc_netmems		= io_pp_zc_alloc_netmems,
 	.release_netmem		= io_pp_zc_release_netmem,
@@ -677,6 +823,11 @@ static const struct memory_provider_ops io_uring_pp_zc_ops = {
 	.uninstall		= io_pp_uninstall,
 };
 
+/**
+ * io_zcrx_queue_cqe - Queue CQE for received data.
+ * Sets user_data, res, flags, and extra fields in extended CQE.
+ * Returns true on success or false if deferred.
+ */
 static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
 			      struct io_zcrx_ifq *ifq, int off, int len)
 {
@@ -700,6 +851,11 @@ static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
 	return true;
 }
 
+/**
+ * io_zcrx_alloc_fallback - Allocate fallback buffer.
+ * Gets from area's free list and marks it as used.
+ * Returns pointer or NULL if none available.
+ */
 static struct net_iov *io_zcrx_alloc_fallback(struct io_zcrx_area *area)
 {
 	struct net_iov *niov = NULL;
@@ -714,6 +870,10 @@ static struct net_iov *io_zcrx_alloc_fallback(struct io_zcrx_area *area)
 	return niov;
 }
 
+/**
+ * io_zcrx_copy_chunk - Copies data to fallback buffer.
+ * Allocates a fallback buffer, copies data, and posts completion.
+ */
 static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 				  void *src_base, struct page *src_page,
 				  unsigned int src_offset, size_t len)
@@ -761,6 +921,10 @@ static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 	return copied ? copied : ret;
 }
 
+/**
+ * io_zcrx_copy_frag - Copy fragment to fallback buffer.
+ * Loops through frag pages and copies them one by one.
+ */
 static int io_zcrx_copy_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 			     const skb_frag_t *frag, int off, int len)
 {
@@ -780,6 +944,11 @@ static int io_zcrx_copy_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 	return copied;
 }
 
+/**
+ * io_zcrx_recv_frag - Handle fragment reception (zc or copy).
+ * If netmem belongs to us, queues cqe directly.
+ * Otherwise falls back to copying.
+ */
 static int io_zcrx_recv_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 			     const skb_frag_t *frag, int off, int len)
 {
@@ -805,9 +974,11 @@ static int io_zcrx_recv_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 	return len;
 }
 
-static int
-io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
-		 unsigned int offset, size_t len)
+/**
+ * io_zcrx_recv_skb - Processes SKB fragments for zero-copy RX.
+ * Iterates over skb frags and handles each with recv_frag.
+ */
+static int io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb, unsigned int offset, size_t len)
 {
 	struct io_zcrx_args *args = desc->arg.data;
 	struct io_zcrx_ifq *ifq = args->ifq;
@@ -907,6 +1078,10 @@ out:
 	return offset - start_off;
 }
 
+/**
+ * io_zcrx_tcp_recvmsg - Entry point for TCP receive.
+ * Wraps tcp_read_sock with custom read callback.
+ */
 static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 				struct sock *sk, int flags,
 				unsigned issue_flags, unsigned int *outlen)
@@ -953,6 +1128,10 @@ out:
 	return ret;
 }
 
+/**
+ * io_zcrx_recv - Main receive handler for zcrx.
+ * Validates protocol and dispatches to appropriate recv handler.
+ */
 int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
 		 struct socket *sock, unsigned int flags,
 		 unsigned issue_flags, unsigned int *len)

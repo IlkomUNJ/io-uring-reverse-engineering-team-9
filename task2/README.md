@@ -1,3 +1,230 @@
+| Source                | Library                       | Function Utilized                      | Times Used  |
+|-----------------------|-------------------------------|----------------------------------------|-------------|
+| advise.c              | include/asm-generic/rwonce.h  | READ_ONCE                              | 8           |
+|                       | include/linux/io_uring_types.h| io_kiocb_to_cmd                        | 4           |
+|                       | include/linux/mm.h            | do_madvise                             | 1           |
+|                       | io_uring/io_uring.h           | io_req_set_res                         | 2           |
+|                       | mm/fadvise.c                  | vfs_fadvise                            | 1           |
+|                       | io_uring/io_uring.h           | req_set_fail                           | 1           |
+|                       | include/asm-generic/bug.h     | WARN_ON_ONCE                           | 2           |
+| advise.h              | -                             | -                       | -          |
+| alloc_cache.c         | io_uring/alloc_cache.h        | io_alloc_cache_get                     | 1           |
+|                       | mm/slub.c                     | kvfree                                 | 1           |
+|                       | include/linux/slab.h          | kvmalloc_array                         | 1           |
+|                       | tools/lib/slab.c              | kmalloc                                | 1           |
+|                       | arch/x86/include/asm/string_64.h | memset                              | 1           |
+|                       | arch/x86/boot/compressed/misc.h | free                               | 1           |
+| alloc_cache.h         | include/linux/kasan.h         | kasan_mempool_poison_object            | 1           |
+|                       | include/linux/kasan.h         | kasan_mempool_unpoison_object          | 1           |
+|                       | arch/x86/include/asm/string_64.h | memset                              | 1           |
+|                       | alloc_cache.h                 | io_alloc_cache_get                     | 1           |
+|                       | alloc_cache.h                 | io_cache_alloc_new                     | 1           |
+|                       | alloc_cache.h                 | io_alloc_cache_put                     | 1           |
+|                       | linux/mm/slub.c               | kfree                                  | 1           |
+| cancel.c              | cancel.h                      | io_cancel_match_sequence               | 1           |
+|                       | include/linux/container_of.h  | container_of                           | 1           |
+|                       | cancel.c                      | io_cancel_req_match                    | 2           |
+|                       | io_uring/io-wq.c              | io_wq_cancel_cb                        | 1           |
+|                       | include/asm-generic/bug.h     | WARN_ON_ONCE                           | 1           |
+|                       | io_uring/io-wq.h              | io_wq_current_is_worker                | 1           |
+|                       | cancel.c                      | io_async_cancel_one                    | 2           |
+|                       | io_uring/poll.c               | io_poll_cancel                         | 1           |
+|                       | io_uring/waitid.c             | io_waitid_cancel                       | 1           |
+|                       | io_uring/futex.c              | io_futex_cancel                        | 1           |
+|                       | tools/testing/selftests/kvm/include/arm64/spinlock.c | spin_lock                              | 1           |
+|                       | tools/testing/selftests/kvm/include/arm64/spinlock.c | spin_unlock                            | 1           |
+|                       | io_uring/timeout.c            | io_timeout_cancel                      | 1           |
+|                       | include/linux/io_uring_types.h | io_kiocb_to_cmd                       | 2           |
+|                       | include/linux/compiler.h      | unlikely                               | 2           |
+|                       | include/asm-generic/rwonce.h  | READ_ONCE                              | 4           |
+|                       | cancel.c                      | io_try_cancel                          | 1           |
+|                       | io_uring/io_uring.h           | io_ring_submit_lock                    | 2           |
+|                       | include/linux/list.h          | list_for_each_entry                    | 1           |
+|                       | include/linux/atomic/atomic-instrumented.h | atomic_inc_return         | 3           |
+|                       | io_uring/io_uring.c           | io_file_get_fixed                      | 1           |
+|                       | io_uring/io_uring.c           | io_file_get_normal                     | 1           |
+|                       | io_uring/io_uring.c           | __io_async_cancel                      | 2           |
+|                       | io_uring/io_uring.h           | req_set_fail                           | 1           |
+|                       | io_uring/io_uring.h           | io_req_set_res                         | 1           |
+|                       | io_uring/rsrc.h               | io_rsrc_node_lookup                    | 1           |
+|                       | io_uring/filetable.h          | io_slot_file                           | 1           |
+|                       | include/linux/wait.h          | DEFINE_WAIT                            | 1           |
+|                       | include/linux/uaccess.h       | copy_from_user                         | 1           |
+|                       | include/linux/array_size.h    | ARRAY_SIZE                             | 2           |
+|                       | include/linux/file.h          | fget                                   | 1           |
+|                       | cancel.c                      | __io_sync_cancel                       | 2           |
+|                       | include/linux/ktime.h         | ktime_add_ns                           | 1           |
+|                       | include/linux/ktime.h         | timespec64_to_ktime                    | 1           |
+|                       | include/linux/timekeeping.h   | ktime_get_ns                           | 1           |
+|                       | include/linux/wait.h          | prepare_to_wait                        | 1           |
+|                       | include/linux/mutex.h         | mutex_unlock                           | 1           |
+|                       | include/linux/mutex.h         | mutex_lock                             | 1           |
+|                       | io_uring/io_uring.c           | io_run_task_work_sig                   | 1           |
+|                       | kernel/time/sleep_timeout.c   | schedule_hrtimeout                     | 1           |
+|                       | kernel/sched/wait.c           | finish_wait                            | 1           |
+|                       | include/linux/file.h          | fput                                   | 1           |
+|                       | include/linux/lockdep.h       | lockdep_assert_held                    | 1           |
+|                       | include/linux/list.h          | hlist_for_each_entry_safe              | 2           |
+|                       | io_uring/io_uring.c           | io_match_task_safe                     | 1           |
+|                       | include/linux/list.h          | hlist_del_init                         | 1           |
+|                       | io_uring/io_uring.h           | io_ring_submit_unlock                  | 2           |
+| cancel.h              | -                             | -                                      | -           |
+| epoll.c               | include/linux/container_of.h  | io_kiocb_to_cmd                        | 4           |
+|                       | include/asm-generic/rwonce.h  | READ_ONCE                              | 6           |
+|                       | include/linux/eventpoll.h     | ep_op_has_event                        | 1           |
+|                       | include/linux/kernel.h        | u64_to_user_ptr                        | 2           |
+|                       | include/linux/uaccess.h       | copy_from_user                         | 1           |
+|                       | include/linux/eventpoll.h     | do_epoll_ctl                           | 1           |
+|                       | io_uring/io_uring.h           | req_set_fail                           | 2           |
+|	                    | io_uring/io_uring.h	        | io_req_set_res                         | 2 |
+| epoll.h               | -                             | -                                      | -           |
+| eventfd.c             | include/linux/atomic/atomic-instrumented.h | atomic_fetch_or | 1 |
+|                       | include/linux/atomic/atomic-instrumented.h | atomic_set | 1 |
+|                       | drivers/comedi/drivers/ni_routing/tools/convert_c_to_py.c | BIT | 1 |
+|                       | kernel/rcu/tiny.c             | call_rcu | 1 |
+|                       | include/linux/rcupdate.h      | call_rcu_hurry | 1 |
+|                       | drivers/gpu/drm/radeon/mkregtable.c | container_of | 2 |
+|                       | include/linux/uaccess.h       | copy_from_user | 1 |
+|                       | fs/eventfd.c                  | eventfd_ctx_fdget | 1 |
+|                       | fs/eventfd.c                  | eventfd_ctx_put | 1 |
+|                       | include/linux/eventfd.h | eventfd_signal_allowed | 1 |
+|                       | fs/eventfd.c                  | eventfd_signal_mask | 2 |
+|                       | io_uring/eventfd.c            | io_eventfd_grab | 2 |
+|                       | io_uring/eventfd.c            | io_eventfd_put | 3 |
+|                       | io_uring/eventfd.c            | io_eventfd_release | 2 |
+|                       | io_uring/eventfd.c            | __io_eventfd_signal | 2 |
+|                       | io_uring/eventfd.c            | io_eventfd_trigger | 1 |
+|                       | io_uring/io-wq.h              | io_wq_current_is_worker | 1 |
+|                       | crypto/asymmetric_keys/x509_parser.h | IS_ERR | 1 |
+|                       | include/linux/slab.h          | kfree | 2 |
+|                       | include/linux/slab.h          | kmalloc | 1 |
+|                       | include/linux/lockdep.h       | lockdep_is_held | 2 |
+|                       | include/linux/err.h           | PTR_ERR | 1 |
+|                       | include/linux/rcupdate.h      | rcu_assign_pointer | 2 |
+|                       | include/linux/rcupdate.h      | rcu_dereference | 1 |
+|                       | include/linux/rcupdate.h      | rcu_dereference_protected | 2 |
+|                       | include/linux/rcupdate.h      | rcu_read_lock | 1 |
+|                       | include/linux/rcupdate.h      | rcu_read_unlock | 2 |
+|                       | include/asm-generic/rwonce.h  | READ_ONCE | 1 |
+|                       | include/linux/refcount.h      | refcount_dec_and_test | 1 |
+|                       | include/linux/refcount.h      | refcount_inc_not_zero | 1 |
+|                       | include/linux/refcount.h      | refcount_set | 1 |
+|                       | drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.h | spin_lock | 2 |
+|                       | include/linux/spinlock.h      | spin_unlock | 2 |
+| eventfd.h             | -                             | -                                      | -           |
+| fdinfo.c              | io_uring/fdinfo.c             | common_tracking_show_fdinfo | 2 |
+|                       | include/linux/uidgid.h        | from_kgid_munged | 5 |
+|                       | include/linux/uidgid.h        | from_kuid_munged | 4 |
+|                       | kernel/sys.c                  | getrusage | 1 |
+|                       | include/linux/list.h          | hlist_for_each_entry | 1 |
+|                       | io_uring/filetable.h          | io_slot_file | 1 |
+|                       | include/linux/io_uring.h      | io_uring_get_opcode | 1 |
+|                       | io_uring/fdinfo.c             | io_uring_show_cred | 1 |
+|                       | drivers/gpu/drm/radeon/mkregtable.c | list_for_each_entry | 1 |
+|                       | arch/arc/include/asm/arcregs.h | min | 2 |
+|                       | include/linux/mutex.h         | mutex_trylock | 1 |
+|                       | include/linux/mutex.h         | mutex_unlock | 1 |
+|                       | io_uring/fdinfo.c             | napi_show_fdinfo | 1 |
+|                       | include/asm-generic/rwonce.h  | READ_ONCE | 6 |
+|                       | fs/seq_file.c                 | seq_file_path | 1 |
+|                       | fs/seq_file.c                 | seq_printf | 32 |
+|                       | fs/seq_file.c                 | seq_putc | 1 |
+|                       | fs/seq_file.c                 | seq_put_decimal_ull | 9 |
+|                       | fs/seq_file.c                 | seq_put_hex_ll | 1 |
+|                       | include/linux/seq_file.h      | seq_puts | 9 |
+|                       | include/linux/seq_file.h      | seq_user_ns | 1 |
+|                       | drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.h | spin_lock | 1 |
+|                       | include/linux/spinlock.h      | spin_unlock | 1 |
+|                       | include/linux/task_work.h     | task_work_pending | 1 |
+|                       | include/linux/xarray.h        | xa_empty | 1 |
+|                       | include/linux/xarray.h        | xa_for_each | 1 |
+| fdinfo.h              | -                             | -                                      | -           |
+| filetable.c           | include/linux/bitmap.h        | bitmap_free | 1 |
+|                       | lib/bitmap.c                  | bitmap_zalloc | 1 |
+|                       | include/linux/overflow.h      | check_add_overflow | 1 |
+|                       | include/linux/uaccess.h       | copy_from_user | 1 |
+|                       | arch/arm/include/asm/bitops.h | find_next_zero_bit | 1 |
+|                       | fs/file_table.c               | fput | 1 |
+|                       | io_uring/filetable.h          | io_file_bitmap_clear | 1 |
+|                       | io_uring/filetable.c          | io_file_bitmap_get | 1 |
+|                       | io_uring/filetable.h          | io_file_bitmap_set | 1 |
+|                       | io_uring/filetable.h          | io_file_table_set_alloc_range | 1 |
+|                       | io_uring/filetable.c          | __io_fixed_fd_install | 1 |
+|                       | io_uring/filetable.h          | io_fixed_file_set | 1 |
+|                       | io_uring/filetable.c          | io_install_fixed_file | 1 |
+|                       | include/linux/io_uring.h      | io_is_uring_fops | 1 |
+|                       | io_uring/rsrc.h               | io_reset_rsrc_node | 2 |
+|                       | io_uring/io_uring.h           | io_ring_submit_lock | 1 |
+|                       | io_uring/io_uring.h           | io_ring_submit_unlock | 1 |
+|                       | io_uring/rsrc.c               | io_rsrc_data_alloc | 1 |
+|                       | io_uring/rsrc.c               | io_rsrc_data_free | 2 |
+|                       | io_uring/rsrc.c               | io_rsrc_node_alloc | 1 |
+|                       | io_uring/rsrc.h               | io_rsrc_node_lookup | 1 |
+|                       | drivers/block/aoe/aoenet.c    | __must_hold | 1 |
+|                       | include/linux/compiler.h      | unlikely | 3 |
+| filetable.h           | include/linux/bitops.h        | __clear_bit | 1 |
+|                       | io_uring/io_uring.c           | io_file_get_flags | 1 |
+|                       | include/linux/bitops.h        | __set_bit | 1 |
+|                       | arch/x86/boot/bitops.h        | test_bit | 2 |
+|                       | include/asm-generic/bug.h     | WARN_ON_ONCE | 2 |
+| fs.c                  | fs/namei.c                    | do_linkat | 1 |
+|                       | fs/namei.c                    | do_mkdirat | 1 |
+|                       | fs/namei.c                    | do_renameat2 | 1 |
+|                       | fs/namei.c                    | do_rmdir | 1 |
+|                       | fs/namei.c                    | do_symlinkat | 1 |
+|                       | fs/namei.c                    | do_unlinkat | 1 |
+|                       | crypto/af_alg.c               | getname | 7 |
+|                       | fs/namei.c                    | getname_uflags | 1 |
+|                       | include/linux/io_uring_types.h | io_kiocb_to_cmd | 14 |
+|                       | io_uring/io_uring.h           | io_req_set_res | 5 |
+|                       | crypto/asymmetric_keys/x509_parser.h | IS_ERR | 8 |
+|                       | include/linux/err.h           | PTR_ERR | 8 |
+|                       | fs/namei.c                    | putname | 9 |
+|                       | include/asm-generic/rwonce.h  | READ_ONCE | 19 |
+|                       | include/linux/kernel.h        | u64_to_user_ptr | 8 |
+|                       | include/linux/compiler.h      | unlikely | 5 |
+|                       | include/asm-generic/bug.h     | WARN_ON_ONCE | 5 |
+| fs.h                  | -                             | -                                      | -           |
+| futex.c               | drivers/gpu/drm/radeon/mkregtable.c | container_of | 1 |
+|                       | kernel/futex/futex.h | futex2_to_flags | 1 |
+|                       | kernel/futex/futex.h | futex_flags_valid | 1 |
+|                       | kernel/futex/syscalls.c | futex_parse_waitv | 1 |
+|                       | kernel/futex/futex.h | futex_queue | 1 |
+|                       | kernel/futex/core.c | futex_unqueue | 1 |
+|                       | kernel/futex/waitwake.c | futex_unqueue_multiple | 1 |
+|                       | kernel/futex/futex.h | futex_validate_input | 2 |
+|                       | kernel/futex/waitwake.c | futex_wait_multiple_setup | 1 |
+|                       | kernel/futex/waitwake.c | futex_wait_setup | 1 |
+|                       | kernel/futex/waitwake.c | futex_wake | 1 |
+|                       | kernel/futex/waitwake.c | __futex_wake_mark | 2 |
+|                       | include/linux/list.h | hlist_add_head | 2 |
+|                       | include/linux/list.h | hlist_del_init | 2 |
+|                       | io_uring/alloc_cache.c | io_alloc_cache_free | 1 |
+|                       | io_uring/alloc_cache.c | io_alloc_cache_init | 1 |
+|                       | io_uring/alloc_cache.h | io_cache_alloc | 1 |
+|                       | io_uring/alloc_cache.h | io_cache_free | 1 |
+|                       | io_uring/cancel.c | io_cancel_remove | 1 |
+|                       | io_uring/cancel.c | io_cancel_remove_all | 1 |
+|                       | io_uring/futex.c | __io_futex_complete | 2 |
+|                       | io_uring/futex.c | io_futexv_claim | 2 |
+|                       | include/linux/io_uring_types.h | io_kiocb_to_cmd | 8 |
+|                       | io_uring/io_uring.h | io_req_set_res | 8 |
+|                       | io_uring/io_uring.c | io_req_task_complete | 1 |
+|                       | io_uring/io_uring.h | io_req_task_work_add | 3 |
+|                       | io_uring/io_uring.h | io_ring_submit_lock | 2 |
+|                       | io_uring/io_uring.h | io_ring_submit_unlock | 4 |
+|                       | io_uring/io_uring.h | io_tw_lock | 2 |
+|                       | include/linux/slab.h | kcalloc | 1 |
+|                       | include/linux/slab.h | kfree | 4 |
+|                       | include/asm-generic/rwonce.h | READ_ONCE | 6 |
+|                       | io_uring/io_uring.h | req_set_fail | 3 |
+|                       | include/linux/sched.h | __set_current_state | 1 |
+|                       | arch/alpha/include/asm/bitops.h | test_and_set_bit_lock | 1 |
+|                       | arch/x86/boot/bitops.h | test_bit | 1 |
+|                       | include/linux/kernel.h | u64_to_user_ptr | 2 |
+|                       | include/linux/compiler.h | unlikely | 5 |
+| futex.h               | -                             | -                                      | -           |
+
 
 
 // Agastya Dava Nurrahman

@@ -1,3 +1,68 @@
+| Structure name | Defined in        | Attributes | Caller Functions Source | source caller | usage
+|----------------|-------------------|------------|-------------------------|---------------|-------------------
+| io_fadvise     | io_uring/advise.c | file, u64, u64, u32 | io_fadvise_force_async |io_uring/advise.c | function parameter |
+|                |                   |            | io_fadvise_prep         | io_uring/advise.c | local variable, function parameter |
+|                |                   |            | io_fadvise              | io_uring/advise.c | local variable, function parameter |
+| io_madvise     | io_uring/advise.c | file, u64, u64, u32 | io_madvise_prep | io_uring/advise.c | local variable, function parameter |
+|                |                   |            | io_madvise              | io_uring/advise.c | local variable, function parameter |
+| io_cancel      | io_uring/cancel.c | file, u64, u32, u32, u8 | SYSCALL_DEFINE3 |fs/aio.c  | function parameter |
+|                |                   |            | io_async_cancel_prep    | io_uring/cancel.c | local variable, function parameter |
+|                |                   |            | io_async_cancel         | io_uring/cancel.c | local variable, function parameter |
+|                |                   |            | COND_SYSCALL            | kernel/sys_ni.c | function parameter |
+| io_cancel_data | io_uring/cancel.h | io_ring_ctx, union {u64, file}, u8, u32, int | SYSCALL_DEFINE3 |fs/aio.c  | function parameter |
+|                |                   |            | io_cancel_req_match     | io_uring/cancel.c | function parameter |
+|                |                   |            | io_cancel_cb            | io_uring/cancel.c | local variable |
+|                |                   |            | io_async_cancel_one     | io_uring/cancel.c | function parameter |
+|                |                   |            | io_try_cancel           | io_uring/cancel.c | function parameter |
+|                |                   |            | __io_async_cancel       | io_uring/cancel.c | function parameter |
+|                |                   |            | io_async_cancel         | io_uring/cancel.c | local variable |
+|                |                   |            | __io_sync_cancel         | io_uring/cancel.c | function parameter |
+|                |                   |            | io_sync_cancel          | io_uring/cancel.c | local variable |
+|                |                   |            | io_cancel_remove        | io_uring/cancel.c | function parameter |
+|                |                   |            | io_futex_cancel         | io_uring/futex.c  | function parameter |
+|                |                   |            | io_poll_find            | io_uring/poll.c   | function parameter |
+|                |                   |            | io_poll_file_find       | io_uring/poll.c   | function parameter |
+|                |                   |            | __io_poll_cancel        | io_uring/poll.c   | function parameter |
+|                |                   |            | io_poll_cancel          | io_uring/poll.c   | function parameter |
+|                |                   |            | io_poll_remove          | io_uring/poll.c   | local variable |
+|                |                   |            | io_timeout_extract      | io_uring/timeout.c | function parameter |
+|                |                   |            | io_timeout_cancel       | io_uring/timeout.c | function parameter |
+|                |                   |            | io_req_task_link_timeout | io_uring/timeout.c | local variable |
+|                |                   |            | io_timeout_update       | io_uring/timeout.c | local variable |
+|                |                   |            | io_timeout_remove       | io_uring/timeout.c | local variable |
+|                |                   |            | io_waitid_cancel        | io_uring/waitid.c  | function parameter |
+| io_epoll       | io_uring/epoll.c  | file, int, int, int, epoll_event | io_epoll_ctl_prep |io_uring/epoll.c  | local variable, function parameter |
+|                |                   |            | io_epoll_ctl        | io_uring/epoll.c | local variable, function parameter |
+| io_epoll_wait  | io_uring/epoll.c  | file, int, epoll_event |io_epoll_wait_prep |io_uring/epoll.c  | local variable, function parameter |
+|                |                   |            | io_epoll_wait       | io_uring/epoll.c | local variable, function parameter |
+| io_ev_fd       | io_uring/eventfd.c | eventfd_ctx, unsigned int, unsigned, refcount_t, atomic_t, rcu_head | io_eventfd_free | io_uring/eventfd.c  | local variable, function parameter |
+|                |                   |            | io_eventfd_put      | io_uring/epoll.c | function parameter |
+|                |                   |            | io_eventfd_do_signal | io_uring/epoll.c | local variable, function parameter |
+|                |                   |            | io_eventfd_release  | io_uring/epoll.c | function parameter |
+|                |                   |            | __io_eventfd_signal | io_uring/epoll.c | function parameter |
+|                |                   |            | io_eventfd_trigger  | io_uring/epoll.c | function parameter |
+|                |                   |            | io_eventfd_grab     | io_uring/epoll.c | return value, local variable, function parameter |
+|                |                   |            | io_eventfd_signal   | io_uring/epoll.c | local variable |
+|                |                   |            | io_eventfd_flush_signal | io_uring/epoll.c | local variable |
+|                |                   |            | io_eventfd_register | io_uring/epoll.c | local variable, function parameter |
+|                |                   |            | io_eventfd_unregister | io_uring/epoll.c | local variable, function parameter |
+| io_rename      | io_uring/fs.c     | file, int, int, filename, filename, int | io_renameat_prep | io_uring/fs.c  | local variable, function parameter |
+|                |                   |            | io_renameat         | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | io_renameat_cleanup | io_uring/fs.c | local variable, function parameter |
+| io_unlink      | io_uring/fs.c     | file, int, int, filename | io_unlinkat_prep | io_uring/fs.c  | local variable, function parameter |
+|                |                   |            | io_unlinkat         | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | iio_unlinkat_cleanup | io_uring/fs.c | local variable, function parameter |
+| io_mkdir       | io_uring/fs.c     | file, int, umode_t, filename | io_mkdirat_prep | io_uring/fs.c  | local variable, function parameter |
+|                |                   |            | io_mkdirat         | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | io_mkdirat_cleanup | io_uring/fs.c | local variable, function parameter |
+| io_link        | io_uring/fs.c     | file, int, int, filename, filename, int | io_symlinkat_prep | io_uring/fs.c  | local variable, function parameter |
+|                |                   |            | io_symlinkat        | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | io_linkat_prep      | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | io_linkat           | io_uring/fs.c    | local variable, function parameter |
+|                |                   |            | io_link_cleanup     | io_uring/fs.c    | local variable, function parameter |
+
+
+
 // Danar
 
 ### statx.c

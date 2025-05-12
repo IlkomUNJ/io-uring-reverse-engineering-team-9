@@ -1104,178 +1104,424 @@
 
 ### statx.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| statx.c                            | statx.c                            | io_uring_prep_statx            | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source  | Library                              | Function Utilized | Times Used |
+|---------|--------------------------------------|-------------------|------------|
+| statx.c | fs/stat.c                            | do_statx          | 1          |
+|         | fs/namei.c                           | getname_uflags    | 1          |
+|         | include/linux/io_uring_types.h       | io_kiocb_to_cmd   | 3          |
+|         | io_uring/io_uring.h                  | io_req_set_res    | 1          |
+|         | crypto/asymmetric_keys/x509_parser.h | IS_ERR            | 1          |
+|         | include/linux/err.h                  | PTR_ERR           | 1          |
+|         | fs/namei.c                           | putname           | 1          |
+|         | include/asm-generic/rwonce.h         | READ_ONCE         | 5          |
+|         | include/linux/kernel.h               | u64_to_user_ptr   | 2          |
+|         | include/asm-generic/bug.h            | WARN_ON_ONCE      | 1          |
 
 ### statx.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| statx.h                            | statx.h                            | io_uring_prep_statx            | 1          |
-|                                    | statx.h                            | io_uring_submit_statx          | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### sync.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| sync.c                             | sync.c                             | io_uring_prep_fsync            | 1          |
-|                                    | sync.c                             | io_uring_prep_fdatasync        | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->flags                     | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source | Library                        | Function Utilized | Times Used |
+|--------|--------------------------------|-------------------|------------|
+| sync.c | include/linux/fsnotify.h       | fsnotify_modify   | 1          |
+|        | include/linux/io_uring_types.h | io_kiocb_to_cmd   | 6          |
+|        | io_uring/io_uring.h            | io_req_set_res    | 3          |
+|        | include/asm-generic/rwonce.h   | READ_ONCE         | 9          |
+|        | fs/sync.c                      | sync_file_range   | 1          |
+|        | include/linux/compiler.h       | unlikely          | 3          |
+|        | fs/open.c                      | vfs_fallocate     | 1          |
+|        | fs/sync.c                      | vfs_fsync_range   | 1          |
+|        | include/asm-generic/bug.h      | WARN_ON_ONCE      | 3          |
 
 ### sync.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| sync.h                             | sync.h                             | io_uring_prep_fsync            | 1          |
-|                                    | sync.h                             | io_uring_prep_fdatasync        | 1          |
-|                                    | sync.h                             | io_uring_submit_fsync          | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### tctx.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| tctx.c                             | tctx.c                             | io_uring_tctx_get              | 1          |
-|                                    | tctx.c                             | io_uring_tctx_put              | 1          |
-|                                    | linux/sched/task.h                 | get_task_struct                | 1          |
-|                                    | linux/sched/task.h                 | put_task_struct                | 1          |
-|                                    | linux/slab.h                       | kmem_cache_alloc               | 1          |
-|                                    | linux/slab.h                       | kmem_cache_free                | 1          |
-|                                    | kernel/rcu/tree.c                  | call_rcu                       | 1          |
+#next
 
 ### tctx.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| tctx.h                             | tctx.h                             | io_uring_tctx_get              | 1          |
-|                                    | tctx.h                             | io_uring_tctx_put              | 1          |
+#next
 
 ### timeout.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| timeout.c                          | timeout.c                          | io_uring_prep_timeout          | 1          |
-|                                    | timeout.c                          | io_uring_prep_timeout_remove   | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source    | Library                                    | Function Utilized           | Times Used |
+|-----------|--------------------------------------------|-----------------------------|------------|
+| timeout.c | include/linux/atomic/atomic-instrumented.h | atomic_read                 | 4          |
+|           | include/linux/atomic/atomic-instrumented.h | atomic_set                  | 2          |
+|           | include/linux/io_uring_types.h             | cmd_to_io_kiocb             | 6          |
+|           | drivers/gpu/drm/radeon/mkregtable.c        | container_of                | 2          |
+|           | include/linux/compiler.h                   | data_race                   | 1          |
+|           | include/linux/err.h                        | ERR_PTR                     | 2          |
+|           | kernel/time/time.c                         | get_timespec64              | 2          |
+|           | kernel/time/hrtimer.c                      | hrtimer_setup               | 4          |
+|           | include/linux/hrtimer.h                    | hrtimer_start               | 5          |
+|           | kernel/time/hrtimer.c                      | hrtimer_try_to_cancel       | 4          |
+|           | include/asm-generic/bitops/const_hweight.h | hweight32                   | 2          |
+|           | drivers/gpu/drm/radeon/mkregtable.c        | INIT_LIST_HEAD              | 1          |
+|           | io_uring/cancel.c                          | io_cancel_req_match         | 1          |
+|           | io_uring/timeout.h                         | io_disarm_linked_timeout    | 1          |
+|           | io_uring/timeout.c                         | io_fail_links               | 1          |
+|           | io_uring/timeout.c                         | io_flush_killed_timeouts    | 2          |
+|           | io_uring/io_uring.h                        | io_for_each_link            | 1          |
+|           | io_uring/io_uring.c                        | io_free_req                 | 1          |
+|           | io_uring/timeout.c                         | io_is_timeout_noseq         | 3          |
+|           | io_uring/timeout.c                         | io_kill_timeout             | 2          |
+|           | include/linux/io_uring_types.h             | io_kiocb_to_cmd             | 14         |
+|           | io_uring/timeout.c                         | io_linked_timeout_update    | 1          |
+|           | io_uring/timeout.c                         | io_match_task               | 1          |
+|           | io_uring/timeout.c                         | io_put_req                  | 2          |
+|           | io_uring/io_uring.c                        | io_queue_next               | 1          |
+|           | io_uring/timeout.c                         | io_remove_next_linked       | 3          |
+|           | io_uring/io_uring.c                        | io_req_post_cqe             | 1          |
+|           | io_uring/io_uring.h                        | io_req_queue_tw_complete    | 3          |
+|           | io_uring/io_uring.h                        | io_req_set_res              | 5          |
+|           | io_uring/io_uring.c                        | io_req_task_complete        | 4          |
+|           | io_uring/io_uring.c                        | io_req_task_queue_fail      | 1          |
+|           | io_uring/io_uring.h                        | io_req_task_work_add        | 3          |
+|           | io_uring/io_uring.h                        | io_should_terminate_tw      | 1          |
+|           | io_uring/timeout.c                         | io_timeout_cancel           | 1          |
+|           | io_uring/timeout.c                         | io_timeout_extract          | 2          |
+|           | io_uring/timeout.c                         | io_timeout_finish           | 1          |
+|           | io_uring/timeout.c                         | io_timeout_get_clock        | 4          |
+|           | io_uring/timeout.c                         | __io_timeout_prep           | 2          |
+|           | io_uring/timeout.c                         | io_timeout_update           | 1          |
+|           | io_uring/timeout.c                         | io_translate_timeout_mode   | 2          |
+|           | io_uring/cancel.c                          | io_try_cancel               | 1          |
+|           | io_uring/io_uring.h                        | io_tw_lock                  | 1          |
+|           | io_uring/io_uring.h                        | io_uring_alloc_async_data   | 1          |
+|           | crypto/asymmetric_keys/x509_parser.h       | IS_ERR                      | 2          |
+|           | include/linux/list.h                       | list_add                    | 2          |
+|           | drivers/gpu/drm/radeon/mkregtable.c        | list_add_tail               | 2          |
+|           | include/linux/list.h                       | list_del                    | 2          |
+|           | include/linux/list.h                       | list_del_init               | 3          |
+|           | drivers/net/wireless/ath/ath11k/hal.h      | list_empty                  | 2          |
+|           | drivers/block/loop.c                       | list_entry                  | 1          |
+|           | include/linux/list.h                       | list_first_entry            | 1          |
+|           | drivers/gpu/drm/radeon/mkregtable.c        | list_for_each_entry         | 2          |
+|           | include/linux/list.h                       | list_for_each_entry_safe    | 2          |
+|           | include/linux/list.h                       | list_for_each_prev          | 1          |
+|           | include/linux/list.h                       | LIST_HEAD                   | 2          |
+|           | include/linux/list.h                       | list_move_tail              | 1          |
+|           | drivers/block/aoe/aoenet.c                 | __must_hold                 | 10         |
+|           | include/linux/err.h                        | PTR_ERR                     | 2          |
+|           | include/linux/spinlock.h                   | raw_spin_lock_irq           | 8          |
+|           | include/linux/spinlock.h                   | raw_spin_lock_irqsave       | 2          |
+|           | include/linux/spinlock.h                   | raw_spin_unlock_irq         | 8          |
+|           | include/linux/spinlock.h                   | raw_spin_unlock_irqrestore  | 2          |
+|           | include/asm-generic/rwonce.h               | READ_ONCE                   | 4          |
+|           | io_uring/io_uring.h                        | req_has_async_data          | 1          |
+|           | block/blk.h                                | req_ref_inc_not_zero        | 1          |
+|           | block/blk.h                                | req_ref_put_and_test        | 1          |
+|           | io_uring/io_uring.h                        | req_set_fail                | 3          |
+|           | drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.h   | spin_lock                   | 2          |
+|           | include/linux/spinlock.h                   | spin_unlock                 | 2          |
+|           | include/linux/ktime.h                      | timespec64_to_ktime         | 5          |
+|           | unknown                                    | trace_io_uring_fail_link    | 1          |
+|           | include/linux/kernel.h                     | u64_to_user_ptr             | 2          |
+|           | include/linux/compiler.h                   | unlikely                    | 3          |
+|           | include/asm-generic/bug.h                  | WARN_ON_ONCE                | 2          |
 
 ### timeout.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| timeout.h                          | timeout.h                          | io_uring_prep_timeout          | 1          |
-|                                    | timeout.h                          | io_uring_prep_timeout_remove   | 1          |
-|                                    | timeout.h                          | io_uring_submit_timeout        | 1          |
+| Source    | Library            | Function Utilized          | Times Used |
+|-----------|--------------------|----------------------------|------------|
+| timeout.h | io_uring/timeout.c | __io_disarm_linked_timeout | 1          |
 
 ### truncate.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| truncate.c                         | truncate.c                         | io_uring_prep_truncate         | 1          |
-|                                    | truncate.c                         | io_uring_prep_ftruncate        | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->off                       | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source     | Library                        | Function Utilized | Times Used |
+|------------|--------------------------------|-------------------|------------|
+| truncate.c | fs/open.c                      | do_ftruncate      | 1          |
+|            | include/linux/io_uring_types.h | io_kiocb_to_cmd   | 2          |
+|            | io_uring/io_uring.h            | io_req_set_res    | 1          |
+|            | include/asm-generic/rwonce.h   | READ_ONCE         | 1          |
+|            | include/asm-generic/bug.h      | WARN_ON_ONCE      | 1          |
 
 ### truncate.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| truncate.h                         | truncate.h                         | io_uring_prep_truncate         | 1          |
-|                                    | truncate.h                         | io_uring_prep_ftruncate        | 1          |
-|                                    | truncate.h                         | io_uring_submit_truncate       | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### uring_cmd.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| uring_cmd.c                        | uring_cmd.c                        | io_uring_prep_uring_cmd        | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->len                       | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source      | Library                             | Function Utilized            | Times Used |
+|-------------|-------------------------------------|------------------------------|------------|
+| uring_cmd.c | arch/x86/include/asm/kvm-x86-ops.h  | BUILD_BUG_ON                 | 1          |
+|             | include/linux/io_uring_types.h      | cmd_to_io_kiocb              | 7          |
+|             | net/socket.c                        | do_sock_getsockopt           | 1          |
+|             | net/socket.c                        | do_sock_setsockopt           | 1          |
+|             | include/linux/list.h                | hlist_add_head               | 1          |
+|             | include/linux/list.h                | hlist_del                    | 1          |
+|             | include/linux/list.h                | hlist_for_each_entry_safe    | 1          |
+|             | io_uring/alloc_cache.h              | io_alloc_cache_put           | 1          |
+|             | io_uring/rsrc.h                     | io_alloc_cache_vec_kasan     | 1          |
+|             | arch/alpha/kernel/rtc.c             | ioctl                        | 2          |
+|             | io_uring/rsrc.c                     | io_import_reg_buf            | 1          |
+|             | io_uring/rsrc.c                     | io_import_reg_vec            | 1          |
+|             | io_uring/io_uring.h                 | io_is_compat                 | 1          |
+|             | include/linux/io_uring_types.h      | io_kiocb_to_cmd              | 6          |
+|             | io_uring/rsrc.c                     | io_prep_reg_iovec            | 1          |
+|             | io_uring/io_uring.h                 | io_req_complete_defer        | 1          |
+|             | io_uring/io_uring.c                 | io_req_queue_iowq            | 1          |
+|             | io_uring/uring_cmd.c                | io_req_set_cqe32_extra       | 1          |
+|             | io_uring/io_uring.h                 | io_req_set_res               | 2          |
+|             | io_uring/io_uring.c                 | __io_req_task_work_add       | 1          |
+|             | io_uring/io_uring.h                 | io_req_task_work_add         | 1          |
+|             | io_uring/uring_cmd.c                | io_req_uring_cleanup         | 3          |
+|             | io_uring/io_uring.h                 | io_ring_submit_lock          | 2          |
+|             | io_uring/io_uring.h                 | io_ring_submit_unlock        | 2          |
+|             | io_uring/io_uring.h                 | io_should_terminate_tw       | 1          |
+|             | io_uring/io_uring.h                 | io_submit_flush_completions  | 1          |
+|             | io_uring/io_uring.h                 | io_uring_alloc_async_data    | 1          |
+|             | io_uring/uring_cmd.c                | io_uring_cmd_del_cancelable  | 1          |
+|             | io_uring/uring_cmd.c                | io_uring_cmd_getsockopt      | 1          |
+|             | io_uring/uring_cmd.c                | io_uring_cmd_prep_setup      | 1          |
+|             | io_uring/uring_cmd.c                | io_uring_cmd_setsockopt      | 1          |
+|             | io_uring/rsrc.c                     | io_vec_free                  | 2          |
+|             | include/linux/sockptr.h             | KERNEL_SOCKPTR               | 1          |
+|             | include/linux/slab.h                | kfree                        | 2          |
+|             | include/linux/lockdep.h             | lockdep_assert_held          | 1          |
+|             | arch/alpha/include/asm/string.h     | memcpy                       | 1          |
+|             | drivers/gpu/drm/radeon/mkregtable.c | offsetof                     | 1          |
+|             | include/asm-generic/rwonce.h        | READ_ONCE                    | 12         |
+|             | io_uring/io_uring.h                 | req_set_fail                 | 2          |
+|             | include/linux/security.h            | security_uring_cmd           | 1          |
+|             | include/asm-generic/barrier.h       | smp_store_release            | 1          |
+|             | include/linux/io_uring/cmd.h        | task_work_cb                 | 1          |
+|             | include/linux/kernel.h              | u64_to_user_ptr              | 2          |
+|             | block/fops.c                        | uring_cmd                    | 2          |
+|             | io_uring/io_uring.h                 | uring_sqe_size               | 1          |
+|             | include/linux/sockptr.h             | USER_SOCKPTR                 | 2          |
+|             | include/asm-generic/bug.h           | WARN_ON_ONCE                 | 1          |
 
 ### uring_cmd.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| uring_cmd.h                        | uring_cmd.h                        | io_uring_prep_uring_cmd        | 1          |
-|                                    | uring_cmd.h                        | io_uring_submit_uring_cmd      | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### waitid.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| waitid.c                           | waitid.c                           | io_uring_prep_waitid           | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source   | Library                                                   | Function Utilized         | Times Used |
+|----------|-----------------------------------------------------------|---------------------------|------------|
+| waitid.c | kernel/sched/wait.c                                       | add_wait_queue            | 2          |  
+|          | include/linux/atomic/atomic-instrumented.h                | atomic_fetch_inc          | 2          |
+|          | include/linux/atomic/atomic-instrumented.h                | atomic_or                 | 1          |
+|          | include/linux/atomic/atomic-instrumented.h                | atomic_read               | 2          |
+|          | include/linux/atomic/atomic-instrumented.h                | atomic_set                | 1          |
+|          | include/linux/atomic/atomic-instrumented.h                | atomic_sub_return         | 1          |
+|          | drivers/comedi/drivers/ni_routing/tools/convert_c_to_py.c | BIT                       | 1          |
+|          | drivers/gpu/drm/radeon/mkregtable.c                       | container_of              | 2          |
+|          | kernel/exit.c                                             | __do_wait                 | 3          |
+|          | include/linux/bits.h                                      | GENMASK                   | 1          |
+|          | include/linux/list.h                                      | hlist_add_head            | 1          |
+|          | include/linux/list.h                                      | hlist_del_init            | 2          |
+|          | include/linux/wait.h                                      | init_waitqueue_func_entry | 1          |
+|          | io_uring/cancel.c                                         | io_cancel_remove          | 1          |
+|          | io_uring/cancel.c                                         | io_cancel_remove_all      | 1          |
+|          | io_uring/io_uring.h                                       | io_is_compat              | 1          |
+|          | include/linux/io_uring_types.h                            | io_kiocb_to_cmd           | 8          |
+|          | io_uring/io_uring.h                                       | io_req_queue_tw_complete  | 1          |
+|          | io_uring/io_uring.h                                       | io_req_set_res            | 2          |
+|          | io_uring/io_uring.c                                       | io_req_task_complete      | 1          |
+|          | io_uring/io_uring.h                                       | io_req_task_work_add      | 2          |
+|          | io_uring/io_uring.h                                       | io_ring_submit_lock       | 1          |
+|          | io_uring/io_uring.h                                       | io_ring_submit_unlock     | 3          |
+|          | io_uring/io_uring.h                                       | io_tw_lock                | 1          |
+|          | io_uring/io_uring.h                                       | io_uring_alloc_async_data | 1          |
+|          | io_uring/waitid.c                                         | io_waitid_compat_copy_si  | 1          |
+|          | io_uring/waitid.c                                         | io_waitid_complete        | 2          |
+|          | io_uring/waitid.c                                         | io_waitid_copy_si         | 1          |
+|          | io_uring/waitid.c                                         | io_waitid_drop_issue_ref  | 2          |
+|          | io_uring/waitid.c                                         | io_waitid_finish          | 2          |
+|          | io_uring/waitid.c                                         | io_waitid_free            | 1          |
+|          | kernel/exit.c                                             | kernel_waitid_prepare     | 1          |
+|          | include/linux/slab.h                                      | kfree                     | 1          |
+|          | include/linux/list.h                                      | list_del_init             | 2          |
+|          | include/linux/lockdep.h                                   | lockdep_assert_held       | 1          |
+|          | kernel/exit.c                                             | pid_child_should_wake     | 1          |
+|          | kernel/pid.c                                              | put_pid                   | 1          |
+|          | include/asm-generic/rwonce.h                              | READ_ONCE                 | 4          |
+|          | kernel/sched/wait.c                                       | remove_wait_queue         | 3          |
+|          | io_uring/io_uring.h                                       | req_set_fail              | 2          |
+|          | include/linux/spinlock.h                                  | spin_lock_irq             | 1          |
+|          | include/linux/spinlock.h                                  | spin_unlock_irq           | 1          |
+|          | include/linux/kernel.h                                    | u64_to_user_ptr           | 1          |
+|          | include/linux/compiler.h                                  | unlikely                  | 2          |
+|          | arch/arm64/include/asm/uaccess.h                          | unsafe_put_user           | 12         |
+|          | arch/powerpc/include/asm/uaccess.h                        | user_write_access_begin   | 2          |
+|          | arch/powerpc/include/asm/uaccess.h                        | user_write_access_end     | 2          |
+|          | include/asm-generic/bug.h                                 | WARN_ON_ONCE              | 1          |
 
 ### waitid.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| waitid.h                           | waitid.h                           | io_uring_prep_waitid           | 1          |
-|                                    | waitid.h                           | io_uring_submit_waitid         | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### xattr.c
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| xattr.c                            | xattr.c                            | io_uring_prep_getxattr         | 1          |
-|                                    | xattr.c                            | io_uring_prep_setxattr         | 1          |
-|                                    | xattr.c                            | io_uring_prep_removexattr      | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe               | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                    | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                      | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                        | 1          |
-|                                    | string.h                           | memset                         | 1          |
+| Source  | Library                              | Function Utilized   | Times Used |
+|---------|--------------------------------------|---------------------|------------|
+| xattr.c | fs/xattr.c                           | file_getxattr       | 1          |
+|         | fs/xattr.c                           | filename_getxattr   | 1          |
+|         | fs/xattr.c                           | filename_setxattr   | 1          |
+|         | fs/xattr.c                           | file_setxattr       | 1          |
+|         | crypto/af_alg.c                      | getname             | 2          |
+|         | fs/xattr.c                           | import_xattr_name   | 1          |
+|         | io_uring/xattr.c                     | __io_getxattr_prep  | 2          |
+|         | include/linux/io_uring_types.h       | io_kiocb_to_cmd     | 9          |
+|         | io_uring/io_uring.h                  | io_req_set_res      | 1          |
+|         | io_uring/xattr.c                     | __io_setxattr_prep  | 2          |
+|         | io_uring/xattr.c                     | io_xattr_cleanup    | 1          |
+|         | io_uring/xattr.c                     | io_xattr_finish     | 4          |
+|         | crypto/asymmetric_keys/x509_parser.h | IS_ERR              | 2          |
+|         | include/linux/slab.h                 | kfree               | 3          |
+|         | include/linux/slab.h                 | kmalloc             | 2          |
+|         | drivers/vdpa/mlx5/core/mr.c          | kvfree              | 1          |
+|         | include/linux/err.h                  | PTR_ERR             | 2          |
+|         | fs/namei.c                           | putname             | 1          |
+|         | include/asm-generic/rwonce.h         | READ_ONCE           | 10         |
+|         | fs/xattr.c                           | setxattr_copy       | 1          |
+|         | include/linux/kernel.h               | u64_to_user_ptr     | 6          |
+|         | include/linux/compiler.h             | unlikely            | 2          |
+|         | include/asm-generic/bug.h            | WARN_ON_ONCE        | 4          |
 
 ### xattr.h
 
-| Source File                        | Library/Header                     | Function/Struct                | Times Used |
-|------------------------------------|------------------------------------|--------------------------------|------------|
-| xattr.h                            | xattr.h                            | io_uring_prep_getxattr         | 1          |
-|                                    | xattr.h                            | io_uring_prep_setxattr         | 1          |
-|                                    | xattr.h                            | io_uring_prep_removexattr      | 1          |
-|                                    | xattr.h                            | io_uring_submit_getxattr       | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|
 
 ### zcrx.c
 
-| Source File                        | Library/Header                     | Function/Struct                   | Times Used |
-|------------------------------------|------------------------------------|-----------------------------------|------------|
-| zcrx.c                             | zcrx.c                             | io_uring_prep_zerocopy_recv       | 1          |
-|                                    | zcrx.c                             | io_uring_prep_zerocopy_recv_multi | 1          |
-|                                    | io_uring/io_uring.c                | io_uring_get_sqe                  | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->opcode                       | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->fd                           | 1          |
-|                                    | uapi/linux/io_uring.h              | sqe->addr                         | 1          |
-|                                    | string.h                           | memset                            | 1          |
+| Source | Library                                             | Function Utilized             | Times Used |
+|--------|-----------------------------------------------------|-------------------------------|------------|
+| zcrx.c | include/linux/nospec.h                              | array_index_nospec            | 1          |
+|        | include/linux/atomic/atomic-instrumented.h          | atomic_dec                    | 1          |
+|        | include/linux/atomic/atomic-instrumented.h          | atomic_inc                    | 1          |
+|        | include/linux/atomic/atomic-instrumented.h          | atomic_read                   | 2          |
+|        | include/linux/atomic/atomic-instrumented.h          | atomic_set                    | 1          |
+|        | include/linux/atomic/atomic-instrumented.h          | atomic_xchg                   | 1          |
+|        | arch/powerpc/kernel/iommu.c                         | capable                       | 1          |
+|        | drivers/gpu/drm/radeon/mkregtable.c                 | container_of                  | 1          |
+|        | include/linux/uaccess.h                             | copy_from_user                | 3          |
+|        | include/linux/uaccess.h                             | copy_to_user                  | 3          |
+|        | include/linux/dma-mapping.h                         | dma_dev_need_sync             | 1          |
+|        | include/linux/dma-mapping.h                         | dma_map_page_attrs            | 1          |
+|        | drivers/net/ethernet/google/gve/gve.h               | dma_mapping_error             | 1          |
+|        | kernel/dma/mapping.c                                | __dma_sync_single_for_device  | 1          |
+|        | include/linux/dma-mapping.h                         | dma_unmap_page_attrs          | 2          |
+|        | drivers/base/core.c                                 | get_device                    | 1          |
+|        | io_uring/zcrx.c                                     | io_allocate_rbuf_ring         | 1          |
+|        | io_uring/rsrc.c                                     | io_buffer_validate            | 1          |
+|        | io_uring/zcrx.c                                     | io_close_queue                | 2          |
+|        | io_uring/memmap.c                                   | io_create_region_mmap_safe    | 1          |
+|        | io_uring/io_uring.h                                 | io_defer_get_uncommited_cqe   | 1          |
+|        | io_uring/zcrx.c                                     | io_free_rbuf_ring             | 1          |
+|        | io_uring/memmap.c                                   | io_free_region                | 1          |
+|        | io_uring/zcrx.c                                     | io_get_user_counter           | 4          |
+|        | io_uring/memmap.c                                   | io_pin_pages                  | 1          |
+|        | io_uring/memmap.h                                   | io_region_get_ptr             | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_alloc_fallback        | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_copy_chunk            | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_copy_frag             | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_create_area           | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_drop_netdev           | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_free_area             | 2          |
+|        | io_uring/zcrx.c                                     | __io_zcrx_get_free_niov       | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_get_niov_uref         | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_get_rqe               | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_ifq_alloc             | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_ifq_free              | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_iov_page              | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_iov_to_area           | 4          |
+|        | io_uring/zcrx.c                                     | io_zcrx_map_area              | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_put_niov_uref         | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_queue_cqe             | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_recv_frag             | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_recv_skb              | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_refill_slow           | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_return_niov           | 3          |
+|        | io_uring/zcrx.c                                     | io_zcrx_return_niov_freelist  | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_ring_refill           | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_rqring_entries        | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_scrub                 | 1          |
+|        | io_uring/zcrx.c                                     | io_zcrx_sync_for_device       | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_tcp_recvmsg           | 1          |
+|        | io_uring/zcrx.c                                     | __io_zcrx_unmap_area          | 2          |
+|        | io_uring/zcrx.c                                     | io_zcrx_unmap_area            | 1          |
+|        | crypto/asymmetric_keys/x509_parser.h                | IS_ERR                        | 1          |
+|        | include/linux/slab.h                                | kfree                         | 2          |
+|        | include/linux/highmem-internal.h                    | kmap_local_page               | 2          |
+|        | include/linux/highmem-internal.h                    | kunmap_local                  | 2          |
+|        | drivers/vdpa/mlx5/core/mr.c                         | kvfree                        | 4          |
+|        | include/linux/slab.h                                | kvmalloc_array                | 3          |
+|        | include/linux/slab.h                                | kzalloc                       | 2          |
+|        | include/linux/compiler.h                            | likely                        | 1          |
+|        | include/linux/lockdep.h                             | lockdep_assert_held           | 3          |
+|        | include/net/sock.h                                  | lock_sock                     | 1          |
+|        | include/linux/fortify-string.h                      | memchr_inv                    | 1          |
+|        | arch/alpha/include/asm/string.h                     | memcpy                        | 1          |
+|        | arch/arc/include/asm/arcregs.h                      | min                           | 1          |
+|        | arch/powerpc/boot/types.h                           | min_t                         | 4          |
+|        | net/core/dev.c                                      | netdev_get_by_index           | 1          |
+|        | include/linux/netdevice.h                           | netdev_put                    | 2          |
+|        | include/net/netmem.h                                | net_iov_idx                   | 4          |
+|        | include/net/netmem.h                                | net_iov_owner                 | 1          |
+|        | include/net/netmem.h                                | net_iov_to_netmem             | 8          |
+|        | include/net/netmem.h                                | netmem_is_net_iov             | 1          |
+|        | include/net/netmem.h                                | netmem_to_net_iov             | 2          |
+|        | net/core/netdev_rx_queue.c                          | net_mp_close_rxq              | 1          |
+|        | include/net/page_pool/memory_provider.h             | net_mp_netmem_place_in_cache  | 2          |
+|        | net/core/page_pool.c                                | net_mp_niov_clear_page_pool   | 1          |
+|        | net/core/page_pool.c                                | net_mp_niov_set_dma_addr      | 2          |
+|        | net/core/page_pool.c                                | net_mp_niov_set_page_pool     | 1          |
+|        | net/core/netdev_rx_queue.c                          | net_mp_open_rxq               | 1          |
+|        | include/net/netlink.h                               | nla_nest_end                  | 1          |
+|        | include/net/netlink.h                               | nla_nest_start                | 1          |
+|        | drivers/gpu/drm/radeon/mkregtable.c                 | offsetof                      | 2          |
+|        | include/net/page_pool/helpers.h                     | page_pool_fragment_netmem     | 1          |
+|        | include/net/page_pool/helpers.h                     | page_pool_get_dma_addr_netmem | 2          |
+|        | net/core/page_pool.c                                | page_pool_put_unrefed_netmem  | 1          |
+|        | include/net/page_pool/helpers.h                     | page_pool_ref_netmem          | 1          |
+|        | include/net/page_pool/helpers.h                     | page_pool_unref_netmem        | 2          |
+|        | include/linux/percpu-refcount.h                     | percpu_ref_get                | 1          |
+|        | include/linux/percpu-refcount.h                     | percpu_ref_put                | 1          |
+|        | include/linux/err.h                                 | PTR_ERR                       | 1          |
+|        | drivers/base/core.c                                 | put_device                    | 1          |
+|        | include/asm-generic/rwonce.h                        | READ_ONCE                     | 1          |
+|        | net/core/sock.c                                     | release_sock                  | 1          |
+|        | include/linux/log2.h                                | roundup_pow_of_two            | 1          |
+|        | include/linux/skbuff.h                              | skb_frag_foreach_page         | 1          |
+|        | include/linux/skbuff.h                              | skb_frag_is_net_iov           | 1          |
+|        | include/linux/skbuff.h                              | skb_frag_off                  | 2          |
+|        | include/linux/skbuff.h                              | skb_frag_size                 | 1          |
+|        | include/linux/skbuff.h                              | skb_headlen                   | 4          |
+|        | include/linux/skbuff.h                              | skb_shinfo                    | 2          |
+|        | include/linux/skbuff.h                              | skb_walk_frags                | 1          |
+|        | include/asm-generic/barrier.h                       | smp_load_acquire              | 1          |
+|        | include/asm-generic/barrier.h                       | smp_store_release             | 1          |
+|        | include/net/sock.h                                  | sock_error                    | 1          |
+|        | include/net/sock.h                                  | sock_flag                     | 2          |
+|        | include/net/rps.h                                   | sock_rps_record_flow          | 1          |
+|        | drivers/gpu/drm/msm/disp/dpu1/dpu_crtc.h            | spin_lock                     | 2          |
+|        | include/linux/spinlock.h                            | spin_lock_bh                  | 4          |
+|        | include/linux/spinlock.h                            | spin_lock_init                | 3          |
+|        | include/linux/spinlock.h                            | spin_unlock                   | 2          |
+|        | include/linux/spinlock.h                            | spin_unlock_bh                | 5          |
+|        | net/ipv4/tcp.c                                      | tcp_read_sock                 | 1          |
+|        | include/linux/kernel.h                              | u64_to_user_ptr               | 5          |
+|        | include/linux/compiler.h                            | unlikely                      | 10         |
+|        | mm/gup.c                                            | unpin_user_pages              | 1          |
+|        | arch/parisc/include/asm/bug.h                       | WARN_ON                       | 2          |
+|        | include/asm-generic/bug.h                           | WARN_ON_ONCE                  | 5          |
 
 ### zcrx.h
 
-| Source File                        | Library/Header                     | Function/Struct                   | Times Used |
-|------------------------------------|------------------------------------|-----------------------------------|------------|
-| zcrx.h                             | zcrx.h                             | io_uring_prep_zerocopy_recv       | 1          |
-|                                    | zcrx.h                             | io_uring_prep_zerocopy_recv_multi | 1          |
-|                                    | zcrx.h                             | io_uring_submit_zerocopy_recv     | 1          |
+| Source | Library | Function Utilized | Times Used |
+|--------|---------|-------------------|------------|

@@ -36,16 +36,16 @@
 | io_epoll_wait  | io_uring/epoll.c  | file, int, epoll_event |io_epoll_wait_prep |io_uring/epoll.c  | local variable, function parameter |
 |                |                   |            | io_epoll_wait       | io_uring/epoll.c | local variable, function parameter |
 | io_ev_fd       | io_uring/eventfd.c | eventfd_ctx, unsigned int, unsigned, refcount_t, atomic_t, rcu_head | io_eventfd_free | io_uring/eventfd.c  | local variable, function parameter |
-|                |                   |            | io_eventfd_put      | io_uring/epoll.c | function parameter |
-|                |                   |            | io_eventfd_do_signal | io_uring/epoll.c | local variable, function parameter |
-|                |                   |            | io_eventfd_release  | io_uring/epoll.c | function parameter |
-|                |                   |            | __io_eventfd_signal | io_uring/epoll.c | function parameter |
-|                |                   |            | io_eventfd_trigger  | io_uring/epoll.c | function parameter |
-|                |                   |            | io_eventfd_grab     | io_uring/epoll.c | return value, local variable, function parameter |
-|                |                   |            | io_eventfd_signal   | io_uring/epoll.c | local variable |
-|                |                   |            | io_eventfd_flush_signal | io_uring/epoll.c | local variable |
-|                |                   |            | io_eventfd_register | io_uring/epoll.c | local variable, function parameter |
-|                |                   |            | io_eventfd_unregister | io_uring/epoll.c | local variable, function parameter |
+|                |                   |            | io_eventfd_put      | io_uring/eventfd.c | function parameter |
+|                |                   |            | io_eventfd_do_signal | io_uring/eventfd.c | local variable, function parameter |
+|                |                   |            | io_eventfd_release  | io_uring/eventfd.c | function parameter |
+|                |                   |            | __io_eventfd_signal | io_uring/eventfd.c | function parameter |
+|                |                   |            | io_eventfd_trigger  | io_uring/eventfd.c | function parameter |
+|                |                   |            | io_eventfd_grab     | io_uring/eventfd.c | return value, local variable, function parameter |
+|                |                   |            | io_eventfd_signal   | io_uring/eventfd.c | local variable |
+|                |                   |            | io_eventfd_flush_signal | io_uring/eventfd.c | local variable |
+|                |                   |            | io_eventfd_register | io_uring/eventfd.c | local variable, function parameter |
+|                |                   |            | io_eventfd_unregister | io_uring/eventfd.c | local variable, function parameter |
 | io_rename      | io_uring/fs.c     | file, int, int, filename, filename, int | io_renameat_prep | io_uring/fs.c  | local variable, function parameter |
 |                |                   |            | io_renameat         | io_uring/fs.c    | local variable, function parameter |
 |                |                   |            | io_renameat_cleanup | io_uring/fs.c | local variable, function parameter |
@@ -60,6 +60,19 @@
 |                |                   |            | io_linkat_prep      | io_uring/fs.c    | local variable, function parameter |
 |                |                   |            | io_linkat           | io_uring/fs.c    | local variable, function parameter |
 |                |                   |            | io_link_cleanup     | io_uring/fs.c    | local variable, function parameter |
+| io_futex       | io_uring/futex.c   | file, union {u32, futex_waitv}, unsigned long, unsigned long, unsigned long, u32, unsigned int, bool | io_futexv_complete | io_uring/futex.c  | local variable, function parameter |
+|                |                   |            | io_futexv_claim    | io_uring/futex.c    | function parameter |
+|                |                   |            | __io_futex_cancel    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futex_prep    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futex_wakev_fn    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futexv_prep    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futexv_wait    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futex_wait    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futex_wake    | io_uring/futex.c    | local variable, function parameter |
+| io_futex_data   | io_uring/futex.c     | futex_q, io_kiocb | io_futex_cache_init | io_uring/fs.c  | function parameter |
+|                |                   |            | __io_futex_cancel    | io_uring/futex.c    | local variable |
+|                |                   |            | io_futex_wake_fn    | io_uring/futex.c    | local variable, function parameter |
+|                |                   |            | io_futex_wait    | io_uring/futex.c    | local variable |
 
 
 

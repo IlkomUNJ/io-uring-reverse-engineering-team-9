@@ -1143,11 +1143,59 @@
 
 ### tctx.c
 
-#next
+| Source | Library                                    | Function Utilized           | Times Used |
+|--------|--------------------------------------------|-----------------------------|------------|
+| tctx.c | include/linux/nospec.h                     | array_index_nospec          | 2          |
+|        | include/linux/atomic/atomic-instrumented.h | atomic_set                  | 2          |
+|        | include/linux/sched.h                      | cond_resched                | 1          | 
+|        | include/linux/uaccess.h                    | copy_from_user              | 2          |
+|        | include/linux/uaccess.h                    | copy_to_user                | 1          |
+|        | include/linux/err.h                        | ERR_PTR                     | 1          |
+|        | arch/alpha/kernel/osf_sys.c                | fget                        | 1          |
+|        | fs/file_table.c                            | fput                        | 5          |
+|        | include/linux/llist.h                      | init_llist_head             | 1          |
+|        | include/linux/task_work.h                  | init_task_work              | 1          |
+|        | include/linux/wait.h                       | init_waitqueue_head         | 2          |
+|        | io_uring/tctx.c                            | io_init_wq_offload          | 1          |
+|        | include/linux/io_uring.h                   | io_is_uring_fops            | 1          |
+|        | io_uring/tctx.c                            | io_ring_add_registered_fd   | 1          |
+|        | io_uring/tctx.c                            | io_ring_add_registered_file | 1          |
+|        | io_uring/tctx.c                            | __io_uring_add_tctx_node    | 2          |
+|        | io_uring/tctx.c                            | io_uring_alloc_task_context | 1          |
+|        | io_uring/tctx.c                            | io_uring_del_tctx_node      | 1          |
+|        | io_uring/io-wq.c                           | io_wq_create                | 1          |
+|        | io_uring/io-wq.c                           | io_wq_max_workers           | 1          |
+|        | io_uring/io-wq.c                           | io_wq_put_and_exit          | 1          |
+|        | crypto/asymmetric_keys/x509_parser.h       | IS_ERR                      | 1          |
+|        | include/linux/slab.h                       | kfree                       | 5          |
+|        | include/linux/slab.h                       | kmalloc                     | 1          |
+|        | include/linux/slab.h                       | kzalloc                     | 2          |
+|        | include/linux/list.h                       | list_add                    | 1          |
+|        | include/linux/list.h                       | list_del                    | 1          |
+|        | drivers/net/wireless/ath/ath11k/hal.h      | list_empty                  | 1          |
+|        | arch/arc/include/asm/arcregs.h             | min                         | 1          |
+|        | include/linux/mutex.h                      | mutex_lock                  | 4          |
+|        | include/linux/mutex.h                      | mutex_unlock                | 5          |
+|        | drivers/infiniband/hw/hfi1/affinity.h      | num_online_cpus             | 1          |
+|        | include/linux/percpu_counter.h             | percpu_counter_destroy      | 2          |
+|        | include/linux/percpu_counter.h             | percpu_counter_init         | 1          |
+|        | include/linux/err.h                        | PTR_ERR                     | 1          |
+|        | include/linux/refcount.h                   | refcount_set                | 1          |
+|        | include/linux/compiler.h                   | unlikely                    | 4          |
+|        | include/asm-generic/bug.h                  | WARN_ON_ONCE                | 5          |
+|        | lib/xarray.c                               | xa_erase                    | 1          |
+|        | include/linux/xarray.h                     | xa_err                      | 1          |
+|        | include/linux/xarray.h                     | xa_for_each                 | 2          |
+|        | include/linux/xarray.h                     | xa_init                     | 1          |
+|        | lib/xarray.c                               | xa_load                     | 1          |
+|        | lib/xarray.c                               | xa_store                    | 1          |
 
 ### tctx.h
 
-#next
+| Source | Library                  | Function Utilized                    | Times Used |
+|--------|--------------------------|--------------------------------------|------------|
+| tctx.h | io_uring/tctx.c          | __io_uring_add_tctx_node_from_submit | 1          |
+|        | include/linux/compiler.h | likely                               | 1          |
 
 ### timeout.c
 

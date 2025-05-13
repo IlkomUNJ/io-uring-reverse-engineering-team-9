@@ -73,7 +73,30 @@
 |                |                   |            | __io_futex_cancel    | io_uring/futex.c    | local variable |
 |                |                   |            | io_futex_wake_fn    | io_uring/futex.c    | local variable, function parameter |
 |                |                   |            | io_futex_wait    | io_uring/futex.c    | local variable |
-
+| io_defer_entry  | io_uring/io_uring.c | list_head, io_kiocb, u32 | io_queue_deferred | io_uring/io_uring.c  | local variable, function parameter |
+|                |                   |            | io_drain_req    | io_uring/io_uring.c    | local variable |
+|                |                   |            | io_cancel_defer_files    | io_uring/io_uring.c    | local variable, function parameter |
+| ext_arg  | io_uring/io_uring.c | size_t, timespec64, sigset_t __user, ktime_t, bool, bool | __io_cqring_wait_schedule | io_uring/io_uring.c  | local variable, function parameter |
+|                |                   |            | io_cqring_wait_schedule    | io_uring/io_uring.c    | function_parameter |
+|                |                   |            | io_cqring_wait    | io_uring/io_uring.c    | function_parameter |
+|                |                   |            | io_get_ext_arg    | io_uring/io_uring.c    | function_parameter |
+|                |                   |            | SYSCALL_DEFINE6    | io_uring/io_uring.c    | local variable, function parameter |
+| io_tctx_exit  | io_uring/io_uring.c | callback_head, completion, io_ring_ctx | io_tctx_exit_cb | io_uring/io_uring.c  | local variable, function parameter |
+|                |                   |            | io_ring_exit_work    | io_uring/io_uring.c    | local variable |
+| io_task_cancel  | io_uring/io_uring.c | io_uring_task, bool | io_cancel_task_cb | io_uring/io_uring.c  | local variable |
+|                |                   |            | io_uring_try_cancel_requests    | io_uring/io_uring.c    | local variable |
+| io_wait_queue  | io_uring/io_uring.h | wait_queue_entry, io_ring_ctx, unsigned, unsigned, unsigned, int, ktime_t, ktime_t, hrtimer | io_wake_function | io_uring/io_uring.c  | local variable, function parameter |
+|                |                   |            | hrtimer_restart io_cqring_timer_wakeup    | io_uring/io_uring.c    | local variable, function parameter |
+|                |                   |            | io_cqring_min_timer_wakeup    | io_uring/io_uring.c    | local variable, function parameter |
+|                |                   |            | io_cqring_schedule_timeout    | io_uring/io_uring.c    | function parameter |
+|                |                   |            | __io_cqring_wait_schedule    | io_uring/io_uring.c    | function parameter |
+|                |                   |            | io_cqring_wait_schedule    | io_uring/io_uring.c    | function parameter |
+|                |                   |            | io_cqring_wait  | io_uring/io_uring.c    | local variable |
+|                |                   |            | io_should_wake  | io_uring/io_uring.h    | function parameter |
+|                |                   |            | io_napi_busy_loop_should_end  | io_uring/napi.c    | local variable |
+|                |                   |            | io_napi_blocking_busy_loop  | io_uring/napi.c    | function parameter |
+|                |                   |            | __io_napi_busy_loop  | io_uring/napi.c    | function parameter |
+|                |                   |            | io_napi_busy_loop  | io_uring/napi.h    | function parameter |
 
 
 // Danar

@@ -241,8 +241,7 @@
 |                |                   |            | __io_read | io_uring/rw.c    | local variable |
 |                |                   |            | io_write | io_uring/rw.c    | local variable |
 |                |                   |            | io_write | io_uring/rw.c    | function parameter, local variable |
-| io_splice | io_uring/splice.c | file,loff_t, u64, int, unsigned int, io_rsrc_node | io_issue_def |io_uring/opdef.c | handler issue |
-|                |                   |            | __io_splice_prep | io_uring/splice.c    | function parameter, local variable |
+| io_splice | io_uring/splice.c | file,loff_t, u64, int, unsigned int, io_rsrc_node | __io_splice_prep | io_uring/splice.c    | function parameter, local variable |
 |                |                   |            | io_splice_cleanup | io_uring/splice.c    | function parameter, local variable |
 |                |                   |            | io_splice_get_file | io_uring/splice.c    | function parameter, local variable |
 |                |                   |            | io_tee | io_uring/splice.c    | function parameter, local variable |

@@ -26,6 +26,9 @@ struct io_rsrc_update {
 	u32				offset;
 };
 
+/**
+ * Registers a new buffer for the submission queue entry (SQE).
+ */
 static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
 			struct iovec *iov, struct page **last_hpage);
 
@@ -35,6 +38,9 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
 
 #define IO_CACHED_BVECS_SEGS	32
 
+/**
+ * Accounts for memory usage for a user.
+ */
 int __io_account_mem(struct user_struct *user, unsigned long nr_pages)
 {
 	unsigned long page_limit, cur_pages, new_pages;
@@ -55,6 +61,9 @@ int __io_account_mem(struct user_struct *user, unsigned long nr_pages)
 	return 0;
 }
 
+/**
+ * Unaccounts for memory usage in the io_ring_ctx.
+ */
 static void io_unaccount_mem(struct io_ring_ctx *ctx, unsigned long nr_pages)
 {
 	if (ctx->user)
@@ -64,6 +73,9 @@ static void io_unaccount_mem(struct io_ring_ctx *ctx, unsigned long nr_pages)
 		atomic64_sub(nr_pages, &ctx->mm_account->pinned_vm);
 }
 
+/**
+ * Accounts for memory usage in the io_ring_ctx.
+ */
 static int io_account_mem(struct io_ring_ctx *ctx, unsigned long nr_pages)
 {
 	int ret;
@@ -80,6 +92,9 @@ static int io_account_mem(struct io_ring_ctx *ctx, unsigned long nr_pages)
 	return 0;
 }
 
+/**
+ * Validates an iovec structure for buffer registration.
+ */
 int io_buffer_validate(struct iovec *iov)
 {
 	unsigned long tmp, acct_len = iov->iov_len + (PAGE_SIZE - 1);
@@ -104,6 +119,9 @@ int io_buffer_validate(struct iovec *iov)
 	return 0;
 }
 
+/**
+ * Releases an unmapped user buffer.
+ */
 static void io_release_ubuf(void *priv)
 {
 	struct io_mapped_ubuf *imu = priv;
@@ -113,6 +131,9 @@ static void io_release_ubuf(void *priv)
 		unpin_user_page(imu->bvec[i].bv_page);
 }
 
+/**
+ * Allocates an io_mapped_ubuf structure.
+ */
 static struct io_mapped_ubuf *io_alloc_imu(struct io_ring_ctx *ctx,
 					   int nr_bvecs)
 {
@@ -122,6 +143,9 @@ static struct io_mapped_ubuf *io_alloc_imu(struct io_ring_ctx *ctx,
 			GFP_KERNEL);
 }
 
+/**
+ * Frees an io_mapped_ubuf structure.
+ */
 static void io_free_imu(struct io_ring_ctx *ctx, struct io_mapped_ubuf *imu)
 {
 	if (imu->nr_bvecs <= IO_CACHED_BVECS_SEGS)
@@ -130,6 +154,9 @@ static void io_free_imu(struct io_ring_ctx *ctx, struct io_mapped_ubuf *imu)
 		kvfree(imu);
 }
 
+/**
+ * Unmaps a previously mapped user buffer.
+ */
 static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_mapped_ubuf *imu)
 {
 	if (!refcount_dec_and_test(&imu->refs))
@@ -141,6 +168,9 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, struct io_mapped_ubuf *imu)
 	io_free_imu(ctx, imu);
 }
 
+/**
+ * Allocates an io_rsrc_node structure.
+ */
 struct io_rsrc_node *io_rsrc_node_alloc(struct io_ring_ctx *ctx, int type)
 {
 	struct io_rsrc_node *node;
@@ -155,6 +185,9 @@ struct io_rsrc_node *io_rsrc_node_alloc(struct io_ring_ctx *ctx, int type)
 	return node;
 }
 
+/**
+ * Initializes the resource caches for the io_ring_ctx.
+ */
 bool io_rsrc_cache_init(struct io_ring_ctx *ctx)
 {
 	const int imu_cache_size = struct_size_t(struct io_mapped_ubuf, bvec,
@@ -169,12 +202,18 @@ bool io_rsrc_cache_init(struct io_ring_ctx *ctx)
 	return ret;
 }
 
+/**
+ * Frees the resource caches for the io_ring_ctx.
+ */
 void io_rsrc_cache_free(struct io_ring_ctx *ctx)
 {
 	io_alloc_cache_free(&ctx->node_cache, kfree);
 	io_alloc_cache_free(&ctx->imu_cache, kfree);
 }
 
+/**
+ * Frees the data associated with an io_rsrc_data structure.
+ */
 __cold void io_rsrc_data_free(struct io_ring_ctx *ctx,
 			      struct io_rsrc_data *data)
 {
@@ -189,6 +228,9 @@ __cold void io_rsrc_data_free(struct io_ring_ctx *ctx,
 	data->nr = 0;
 }
 
+/**
+ * Allocates memory for an io_rsrc_data structure.
+ */
 __cold int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr)
 {
 	data->nodes = kvmalloc_array(nr, sizeof(struct io_rsrc_node *),
@@ -200,6 +242,9 @@ __cold int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr)
 	return -ENOMEM;
 }
 
+/**
+ * Updates registered files for the submission queue entry (SQE).
+ */
 static int __io_sqe_files_update(struct io_ring_ctx *ctx,
 				 struct io_uring_rsrc_update2 *up,
 				 unsigned nr_args)
@@ -265,6 +310,9 @@ static int __io_sqe_files_update(struct io_ring_ctx *ctx,
 	return done ? done : err;
 }
 
+/**
+ * Updates registered buffers for the submission queue entry (SQE).
+ */
 static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
 				   struct io_uring_rsrc_update2 *up,
 				   unsigned int nr_args)
@@ -322,6 +370,9 @@ static int __io_sqe_buffers_update(struct io_ring_ctx *ctx,
 	return done ? done : err;
 }
 
+/**
+ * Registers or updates resources of a given type.
+ */
 static int __io_register_rsrc_update(struct io_ring_ctx *ctx, unsigned type,
 				     struct io_uring_rsrc_update2 *up,
 				     unsigned nr_args)
@@ -342,6 +393,9 @@ static int __io_register_rsrc_update(struct io_ring_ctx *ctx, unsigned type,
 	return -EINVAL;
 }
 
+/**
+ * Registers or updates files for io_uring.
+ */
 int io_register_files_update(struct io_ring_ctx *ctx, void __user *arg,
 			     unsigned nr_args)
 {
@@ -357,6 +411,9 @@ int io_register_files_update(struct io_ring_ctx *ctx, void __user *arg,
 	return __io_register_rsrc_update(ctx, IORING_RSRC_FILE, &up, nr_args);
 }
 
+/**
+ * Registers or updates resources of a given type.
+ */
 int io_register_rsrc_update(struct io_ring_ctx *ctx, void __user *arg,
 			    unsigned size, unsigned type)
 {
@@ -371,6 +428,9 @@ int io_register_rsrc_update(struct io_ring_ctx *ctx, void __user *arg,
 	return __io_register_rsrc_update(ctx, type, &up, up.nr);
 }
 
+/**
+ * Registers resources of a given type.
+ */
 __cold int io_register_rsrc(struct io_ring_ctx *ctx, void __user *arg,
 			    unsigned int size, unsigned int type)
 {
@@ -403,6 +463,9 @@ __cold int io_register_rsrc(struct io_ring_ctx *ctx, void __user *arg,
 	return -EINVAL;
 }
 
+/**
+ * Prepares a files update operation.
+ */
 int io_files_update_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_rsrc_update *up = io_kiocb_to_cmd(req, struct io_rsrc_update);
@@ -420,6 +483,9 @@ int io_files_update_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * Updates files with index allocation.
+ */
 static int io_files_update_with_index_alloc(struct io_kiocb *req,
 					    unsigned int issue_flags)
 {
@@ -459,6 +525,9 @@ static int io_files_update_with_index_alloc(struct io_kiocb *req,
 	return ret;
 }
 
+/**
+ * Updates registered files.
+ */
 int io_files_update(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_rsrc_update *up = io_kiocb_to_cmd(req, struct io_rsrc_update);
@@ -488,6 +557,9 @@ int io_files_update(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * Frees an io_rsrc_node structure and associated resources.
+ */
 void io_free_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
 {
 	if (node->tag)
@@ -508,6 +580,9 @@ void io_free_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
 	io_cache_free(&ctx->node_cache, node);
 }
 
+/**
+ * Unregisters all files for the submission queue entry (SQE).
+ */
 int io_sqe_files_unregister(struct io_ring_ctx *ctx)
 {
 	if (!ctx->file_table.data.nr)
@@ -518,6 +593,9 @@ int io_sqe_files_unregister(struct io_ring_ctx *ctx)
 	return 0;
 }
 
+/**
+ * Registers files for the submission queue entry (SQE).
+ */
 int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
 			  unsigned nr_args, u64 __user *tags)
 {
@@ -587,6 +665,9 @@ fail:
 	return ret;
 }
 
+/**
+ * Unregisters all buffers for the submission queue entry (SQE).
+ */
 int io_sqe_buffers_unregister(struct io_ring_ctx *ctx)
 {
 	if (!ctx->buf_table.nr)
@@ -599,7 +680,7 @@ int io_sqe_buffers_unregister(struct io_ring_ctx *ctx)
  * Not super efficient, but this is just a registration time. And we do cache
  * the last compound head, so generally we'll only do a full search if we don't
  * match that one.
- *
+*
  * We check if the given compound head page has already been accounted, to
  * avoid double accounting it. This allows us to account the full size of the
  * page, not just the constituent pages of a huge page.
@@ -636,6 +717,9 @@ static bool headpage_already_acct(struct io_ring_ctx *ctx, struct page **pages,
 	return false;
 }
 
+/**
+ * Accounts for pinned memory for a buffer.
+ */
 static int io_buffer_account_pin(struct io_ring_ctx *ctx, struct page **pages,
 				 int nr_pages, struct io_mapped_ubuf *imu,
 				 struct page **last_hpage)
@@ -668,6 +752,9 @@ static int io_buffer_account_pin(struct io_ring_ctx *ctx, struct page **pages,
 	return ret;
 }
 
+/**
+ * Coalesces multiple pages into a single buffer entry if possible.
+ */
 static bool io_coalesce_buffer(struct page ***pages, int *nr_pages,
 				struct io_imu_folio_data *data)
 {
@@ -710,6 +797,9 @@ static bool io_coalesce_buffer(struct page ***pages, int *nr_pages,
 	return true;
 }
 
+/**
+ * Checks if a buffer can be coalesced.
+ */
 bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
 			      struct io_imu_folio_data *data)
 {
@@ -756,6 +846,9 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
 	return true;
 }
 
+/**
+ * Registers a buffer for the submission queue entry (SQE).
+ */
 static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
 						   struct iovec *iov,
 						   struct page **last_hpage)
@@ -837,6 +930,9 @@ done:
 	return node;
 }
 
+/**
+ * Registers buffers for the submission queue entry (SQE).
+ */
 int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
 			    unsigned int nr_args, u64 __user *tags)
 {
@@ -907,6 +1003,9 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx, void __user *arg,
 	return ret;
 }
 
+/**
+ * Registers a buffer from a bvec for an io_uring_cmd.
+ */
 int io_buffer_register_bvec(struct io_uring_cmd *cmd, struct request *rq,
 			    void (*release)(void *), unsigned int index,
 			    unsigned int issue_flags)
@@ -969,6 +1068,9 @@ unlock:
 }
 EXPORT_SYMBOL_GPL(io_buffer_register_bvec);
 
+/**
+ * Unregisters a buffer previously registered from a bvec.
+ */
 int io_buffer_unregister_bvec(struct io_uring_cmd *cmd, unsigned int index,
 			      unsigned int issue_flags)
 {
@@ -1002,6 +1104,9 @@ unlock:
 }
 EXPORT_SYMBOL_GPL(io_buffer_unregister_bvec);
 
+/**
+ * Validates a fixed buffer range.
+ */
 static int validate_fixed_range(u64 buf_addr, size_t len,
 				const struct io_mapped_ubuf *imu)
 {
@@ -1017,6 +1122,9 @@ static int validate_fixed_range(u64 buf_addr, size_t len,
 	return 0;
 }
 
+/**
+ * Imports a fixed buffer into an iov_iter.
+ */
 static int io_import_fixed(int ddir, struct iov_iter *iter,
 			   struct io_mapped_ubuf *imu,
 			   u64 buf_addr, size_t len)
@@ -1085,6 +1193,9 @@ static int io_import_fixed(int ddir, struct iov_iter *iter,
 	return 0;
 }
 
+/**
+ * Finds the buffer node associated with an io_kiocb.
+ */
 inline struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
 					     unsigned issue_flags)
 {
@@ -1102,6 +1213,9 @@ inline struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
 	return node;
 }
 
+/**
+ * Imports a registered buffer for an I/O operation.
+ */
 int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
 			u64 buf_addr, size_t len, int ddir,
 			unsigned issue_flags)
@@ -1123,7 +1237,9 @@ static void lock_two_rings(struct io_ring_ctx *ctx1, struct io_ring_ctx *ctx2)
 	mutex_lock_nested(&ctx2->uring_lock, SINGLE_DEPTH_NESTING);
 }
 
-/* Both rings are locked by the caller. */
+/**
+ * Clones buffers from a source io_ring_ctx to a destination io_ring_ctx.
+ */
 static int io_clone_buffers(struct io_ring_ctx *ctx, struct io_ring_ctx *src_ctx,
 			    struct io_uring_clone_buffers *arg)
 {
@@ -1276,6 +1392,9 @@ int io_register_clone_buffers(struct io_ring_ctx *ctx, void __user *arg)
 	return ret;
 }
 
+/**
+ * Frees an iou_vec structure.
+ */
 void io_vec_free(struct iou_vec *iv)
 {
 	if (!iv->iovec)
@@ -1285,6 +1404,9 @@ void io_vec_free(struct iou_vec *iv)
 	iv->nr = 0;
 }
 
+/**
+ * Reallocates an iou_vec structure.
+ */
 int io_vec_realloc(struct iou_vec *iv, unsigned nr_entries)
 {
 	gfp_t gfp = GFP_KERNEL | __GFP_NOWARN;
@@ -1300,6 +1422,9 @@ int io_vec_realloc(struct iou_vec *iv, unsigned nr_entries)
 	return 0;
 }
 
+/**
+ * Fills an iov_iter with bvecs from a mapped user buffer.
+ */
 static int io_vec_fill_bvec(int ddir, struct iov_iter *iter,
 				struct io_mapped_ubuf *imu,
 				struct iovec *iovec, unsigned nr_iovs,
@@ -1350,6 +1475,9 @@ static int io_vec_fill_bvec(int ddir, struct iov_iter *iter,
 	return 0;
 }
 
+/**
+ * Estimates the number of bvecs needed for a given iovec array.
+ */
 static int io_estimate_bvec_size(struct iovec *iov, unsigned nr_iovs,
 				 struct io_mapped_ubuf *imu)
 {
@@ -1362,6 +1490,9 @@ static int io_estimate_bvec_size(struct iovec *iov, unsigned nr_iovs,
 	return max_segs;
 }
 
+/**
+ * Fills an iov_iter with bvecs from a kernel buffer.
+ */
 static int io_vec_fill_kern_bvec(int ddir, struct iov_iter *iter,
 				 struct io_mapped_ubuf *imu,
 				 struct iovec *iovec, unsigned nr_iovs,
@@ -1390,6 +1521,9 @@ static int io_vec_fill_kern_bvec(int ddir, struct iov_iter *iter,
 	return 0;
 }
 
+/**
+ * Calculates the number of segments for a kernel bvec.
+ */
 static int iov_kern_bvec_size(const struct iovec *iov,
 			      const struct io_mapped_ubuf *imu,
 			      unsigned int *nr_seg)
@@ -1413,6 +1547,9 @@ static int iov_kern_bvec_size(const struct iovec *iov,
 	return 0;
 }
 
+/**
+ * Calculates the total number of segments for an array of kernel bvecs.
+ */
 static int io_kern_bvec_size(struct iovec *iov, unsigned nr_iovs,
 			     struct io_mapped_ubuf *imu, unsigned *nr_segs)
 {
@@ -1438,6 +1575,9 @@ static int io_kern_bvec_size(struct iovec *iov, unsigned nr_iovs,
 	return 0;
 }
 
+/**
+ * Imports a registered iovec for an I/O operation.
+ */
 int io_import_reg_vec(int ddir, struct iov_iter *iter,
 			struct io_kiocb *req, struct iou_vec *vec,
 			unsigned nr_iovs, unsigned issue_flags)
@@ -1498,6 +1638,9 @@ int io_import_reg_vec(int ddir, struct iov_iter *iter,
 	return io_vec_fill_bvec(ddir, iter, imu, iov, nr_iovs, vec);
 }
 
+/**
+ * Prepares a registered iovec for an I/O operation.
+ */
 int io_prep_reg_iovec(struct io_kiocb *req, struct iou_vec *iv,
 		      const struct iovec __user *uvec, size_t uvec_segs)
 {

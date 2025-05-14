@@ -11,12 +11,20 @@
 #define req_ref_zero_or_close_to_overflow(req)	\
 	((unsigned int) atomic_read(&(req->refs)) + 127u <= 127u)
 
+/**
+ * Increment the request reference count if it's not zero.
+ * Ensures that the request has the REQ_F_REFCOUNT flag set.
+ */
 static inline bool req_ref_inc_not_zero(struct io_kiocb *req)
 {
 	WARN_ON_ONCE(!(req->flags & REQ_F_REFCOUNT));
 	return atomic_inc_not_zero(&req->refs);
 }
 
+/**
+ * Atomically decrement the request reference count and test if it's zero.
+ * Ensures that the request has the REQ_F_REFCOUNT flag set and is not close to overflow.
+ */
 static inline bool req_ref_put_and_test_atomic(struct io_kiocb *req)
 {
 	WARN_ON_ONCE(!(data_race(req->flags) & REQ_F_REFCOUNT));
@@ -24,6 +32,10 @@ static inline bool req_ref_put_and_test_atomic(struct io_kiocb *req)
 	return atomic_dec_and_test(&req->refs);
 }
 
+/**
+ * Decrement the request reference count and test if it's zero.
+ * If REQ_F_REFCOUNT is not set, returns true. Otherwise, performs an atomic decrement and test.
+ */
 static inline bool req_ref_put_and_test(struct io_kiocb *req)
 {
 	if (likely(!(req->flags & REQ_F_REFCOUNT)))
@@ -33,6 +45,10 @@ static inline bool req_ref_put_and_test(struct io_kiocb *req)
 	return atomic_dec_and_test(&req->refs);
 }
 
+/**
+ * Increment the request reference count.
+ * Ensures that the request has the REQ_F_REFCOUNT flag set and is not close to overflow.
+ */
 static inline void req_ref_get(struct io_kiocb *req)
 {
 	WARN_ON_ONCE(!(req->flags & REQ_F_REFCOUNT));
@@ -40,6 +56,10 @@ static inline void req_ref_get(struct io_kiocb *req)
 	atomic_inc(&req->refs);
 }
 
+/**
+ * Decrement the request reference count.
+ * Ensures that the request has the REQ_F_REFCOUNT flag set and is not close to overflow.
+ */
 static inline void req_ref_put(struct io_kiocb *req)
 {
 	WARN_ON_ONCE(!(req->flags & REQ_F_REFCOUNT));
@@ -47,6 +67,10 @@ static inline void req_ref_put(struct io_kiocb *req)
 	atomic_dec(&req->refs);
 }
 
+/**
+ * Internal helper to set the request reference count.
+ * If REQ_F_REFCOUNT is not set, it sets the flag and initializes the count.
+ */
 static inline void __io_req_set_refcount(struct io_kiocb *req, int nr)
 {
 	if (!(req->flags & REQ_F_REFCOUNT)) {
@@ -55,6 +79,10 @@ static inline void __io_req_set_refcount(struct io_kiocb *req, int nr)
 	}
 }
 
+/**
+ * Set the request reference count to 1.
+ * Uses __io_req_set_refcount to perform the operation.
+ */
 static inline void io_req_set_refcount(struct io_kiocb *req)
 {
 	__io_req_set_refcount(req, 1);

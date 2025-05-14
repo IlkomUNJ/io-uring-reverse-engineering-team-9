@@ -24,6 +24,11 @@ struct io_splice {
 	struct io_rsrc_node		*rsrc_node;
 };
 
+/**
+ * Prepares an I/O splice operation.
+ * Initializes the io_splice structure with values from the submission queue entry (SQE).
+ * Sets flags for the request.
+ */
 static int __io_splice_prep(struct io_kiocb *req,
 			    const struct io_uring_sqe *sqe)
 {
@@ -40,6 +45,10 @@ static int __io_splice_prep(struct io_kiocb *req,
 	return 0;
 }
 
+/**
+ * Prepares an I/O tee operation.
+ * Validates that splice_off_in and off are zero, then calls __io_splice_prep.
+ */
 int io_tee_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	if (READ_ONCE(sqe->splice_off_in) || READ_ONCE(sqe->off))
@@ -47,6 +56,10 @@ int io_tee_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return __io_splice_prep(req, sqe);
 }
 
+/**
+ * Cleans up resources used by an I/O splice operation.
+ * Releases the resource node if it was acquired.
+ */
 void io_splice_cleanup(struct io_kiocb *req)
 {
 	struct io_splice *sp = io_kiocb_to_cmd(req, struct io_splice);
@@ -55,6 +68,11 @@ void io_splice_cleanup(struct io_kiocb *req)
 		io_put_rsrc_node(req->ctx, sp->rsrc_node);
 }
 
+/**
+ * Retrieves the input file for a splice operation.
+ * Handles both fixed and normal file descriptors.
+ * Manages resource node references for fixed files.
+ */
 static struct file *io_splice_get_file(struct io_kiocb *req,
 				       unsigned int issue_flags)
 {
@@ -78,6 +96,11 @@ static struct file *io_splice_get_file(struct io_kiocb *req,
 	return file;
 }
 
+/**
+ * Executes a tee operation.
+ * Duplicates data from an input file to an output file.
+ * Handles file retrieval and cleanup.
+ */
 int io_tee(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_splice *sp = io_kiocb_to_cmd(req, struct io_splice);
@@ -106,6 +129,11 @@ done:
 	return IOU_OK;
 }
 
+/**
+ * Prepares an I/O splice operation by setting up offsets.
+ * Initializes offset fields in the io_splice structure from the SQE.
+ * Calls __io_splice_prep for common preparation tasks.
+ */
 int io_splice_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_splice *sp = io_kiocb_to_cmd(req, struct io_splice);
@@ -115,6 +143,11 @@ int io_splice_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return __io_splice_prep(req, sqe);
 }
 
+/**
+ * Executes a splice operation.
+ * Moves data between an input file and an output file.
+ * Handles file retrieval, offset management, and cleanup.
+ */
 int io_splice(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_splice *sp = io_kiocb_to_cmd(req, struct io_splice);

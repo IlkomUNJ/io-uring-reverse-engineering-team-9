@@ -18,6 +18,9 @@
 	(list)->first = NULL;					\
 } while (0)
 
+/**
+ * Adds a node after a given position in the work queue list.
+ */
 static inline void wq_list_add_after(struct io_wq_work_node *node,
 				     struct io_wq_work_node *pos,
 				     struct io_wq_work_list *list)
@@ -30,6 +33,9 @@ static inline void wq_list_add_after(struct io_wq_work_node *node,
 		list->last = node;
 }
 
+/**
+ * Adds a node to the tail of the work queue list.
+ */
 static inline void wq_list_add_tail(struct io_wq_work_node *node,
 				    struct io_wq_work_list *list)
 {
@@ -43,6 +49,9 @@ static inline void wq_list_add_tail(struct io_wq_work_node *node,
 	}
 }
 
+/**
+ * Adds a node to the head of the work queue list.
+ */
 static inline void wq_list_add_head(struct io_wq_work_node *node,
 				    struct io_wq_work_list *list)
 {
@@ -52,6 +61,11 @@ static inline void wq_list_add_head(struct io_wq_work_node *node,
 	WRITE_ONCE(list->first, node);
 }
 
+/**
+ * Cuts a portion of the work queue list.
+ * The portion removed is from the node 'last' (inclusive) to the end of the list.
+ * 'prev' is the node before 'last'. If 'last' is the first node, 'prev' is NULL.
+ */
 static inline void wq_list_cut(struct io_wq_work_list *list,
 			       struct io_wq_work_node *last,
 			       struct io_wq_work_node *prev)
@@ -67,6 +81,11 @@ static inline void wq_list_cut(struct io_wq_work_list *list,
 	last->next = NULL;
 }
 
+/**
+ * Internal helper to splice a work queue list into another at a given node.
+ * Moves all elements from 'list' and appends them after 'to'.
+ * 'list' will be empty after this operation.
+ */
 static inline void __wq_list_splice(struct io_wq_work_list *list,
 				    struct io_wq_work_node *to)
 {
@@ -75,6 +94,10 @@ static inline void __wq_list_splice(struct io_wq_work_list *list,
 	INIT_WQ_LIST(list);
 }
 
+/**
+ * Splices a work queue list into another at a given node if the source list is not empty.
+ * Returns true if the splice happened, false otherwise.
+ */
 static inline bool wq_list_splice(struct io_wq_work_list *list,
 				  struct io_wq_work_node *to)
 {
@@ -85,6 +108,10 @@ static inline bool wq_list_splice(struct io_wq_work_list *list,
 	return false;
 }
 
+/**
+ * Adds a node to the head of a work queue stack.
+ * The 'stack' itself is a dummy head node.
+ */
 static inline void wq_stack_add_head(struct io_wq_work_node *node,
 				     struct io_wq_work_node *stack)
 {
@@ -92,6 +119,10 @@ static inline void wq_stack_add_head(struct io_wq_work_node *node,
 	stack->next = node;
 }
 
+/**
+ * Deletes a node from the work queue list.
+ * 'prev' is the node before 'node'. If 'node' is the first node, 'prev' is NULL.
+ */
 static inline void wq_list_del(struct io_wq_work_list *list,
 			       struct io_wq_work_node *node,
 			       struct io_wq_work_node *prev)
@@ -99,6 +130,10 @@ static inline void wq_list_del(struct io_wq_work_list *list,
 	wq_list_cut(list, node, prev);
 }
 
+/**
+ * Extracts (removes and returns) the first node from a work queue stack.
+ * The 'stack' itself is a dummy head node. Assumes the stack is not empty.
+ */
 static inline
 struct io_wq_work_node *wq_stack_extract(struct io_wq_work_node *stack)
 {
@@ -108,6 +143,10 @@ struct io_wq_work_node *wq_stack_extract(struct io_wq_work_node *stack)
 	return node;
 }
 
+/**
+ * Gets the next work item in the list.
+ * Returns NULL if the current work item is the last one.
+ */
 static inline struct io_wq_work *wq_next_work(struct io_wq_work *work)
 {
 	if (!work->list.next)

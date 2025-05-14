@@ -88,6 +88,9 @@ int io_buffer_validate(struct iovec *iov);
 bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
 			      struct io_imu_folio_data *data);
 
+/**
+ * Look up a resource node by index.
+ */
 static inline struct io_rsrc_node *io_rsrc_node_lookup(struct io_rsrc_data *data,
 						       int index)
 {
@@ -96,6 +99,9 @@ static inline struct io_rsrc_node *io_rsrc_node_lookup(struct io_rsrc_data *data
 	return NULL;
 }
 
+/**
+ * Put a reference to a resource node, freeing it if refs reach zero.
+ */
 static inline void io_put_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node *node)
 {
 	lockdep_assert_held(&ctx->uring_lock);
@@ -103,6 +109,9 @@ static inline void io_put_rsrc_node(struct io_ring_ctx *ctx, struct io_rsrc_node
 		io_free_rsrc_node(ctx, node);
 }
 
+/**
+ * Reset a resource node at a given index in resource data.
+ */
 static inline bool io_reset_rsrc_node(struct io_ring_ctx *ctx,
 				      struct io_rsrc_data *data, int index)
 {
@@ -115,6 +124,9 @@ static inline bool io_reset_rsrc_node(struct io_ring_ctx *ctx,
 	return true;
 }
 
+/**
+ * Put references to resource nodes associated with a request.
+ */
 static inline void io_req_put_rsrc_nodes(struct io_kiocb *req)
 {
 	if (req->file_node) {
@@ -127,6 +139,9 @@ static inline void io_req_put_rsrc_nodes(struct io_kiocb *req)
 	}
 }
 
+/**
+ * Assign a resource node to a destination, incrementing its reference count.
+ */
 static inline void io_req_assign_rsrc_node(struct io_rsrc_node **dst_node,
 					   struct io_rsrc_node *node)
 {
@@ -134,6 +149,9 @@ static inline void io_req_assign_rsrc_node(struct io_rsrc_node **dst_node,
 	*dst_node = node;
 }
 
+/**
+ * Assign a buffer node to a request.
+ */
 static inline void io_req_assign_buf_node(struct io_kiocb *req,
 					  struct io_rsrc_node *node)
 {
@@ -146,6 +164,9 @@ int io_files_update_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
 
 int __io_account_mem(struct user_struct *user, unsigned long nr_pages);
 
+/**
+ * Unaccount for memory usage for a user.
+ */
 static inline void __io_unaccount_mem(struct user_struct *user,
 				      unsigned long nr_pages)
 {
@@ -155,6 +176,9 @@ static inline void __io_unaccount_mem(struct user_struct *user,
 void io_vec_free(struct iou_vec *iv);
 int io_vec_realloc(struct iou_vec *iv, unsigned nr_entries);
 
+/**
+ * Reset an iou_vec with a new iovec and number of entries.
+ */
 static inline void io_vec_reset_iovec(struct iou_vec *iv,
 				      struct iovec *iovec, unsigned nr)
 {
@@ -163,6 +187,9 @@ static inline void io_vec_reset_iovec(struct iou_vec *iv,
 	iv->nr = nr;
 }
 
+/**
+ * Free an iou_vec if KASAN is enabled, used for cache vectors.
+ */
 static inline void io_alloc_cache_vec_kasan(struct iou_vec *iv)
 {
 	if (IS_ENABLED(CONFIG_KASAN))

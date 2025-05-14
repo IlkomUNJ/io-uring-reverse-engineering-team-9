@@ -224,9 +224,9 @@
 | io_async_rw       | io_uring/rw.h        | iou_vec, size_t, clear, iov_iter, iov_iter_state, iovec, wait_page_queue, uio_meta, io_meta_state                          | io_ring_ctx                      | io_uring/io_uring.c       | function parameter                 |
 |                   |                      |                                                                                                                            | io_issue_def                     | io_uring/opdef.c          | function parameter                 |
 |                   |                      |                                                                                                                            | io_import_vec                    | io_uring/rw.c             | local variable                     |
-|                   |                      |                                                                                                                            | __io_import_rw_buffer            | io_uring/rw.c             | local variable                     |
-|                   |                      |                                                                                                                            | io_import_rw_buffer              | io_uring/rw.c             | local variable                     |
-|                   |                      |                                                                                                                            | io_rw_recycle                    | io_uring/rw.c             | local variable                     |
+|             
+			io_uring_cmd_issue 	uring_cmd.c 	function parameter
+			io_uring_cmd_complete 	uring_cmd.c 	function parameter                                                                                                    | io_rw_recycle                    | io_uring/rw.c             | local variable                     |
 |                   |                      |                                                                                                                            | io_rw_alloc_async                | io_uring/rw.c             | local variable                     |
 |                   |                      |                                                                                                                            | io_meta_save_state               | io_uring/rw.c             | function parameter                 |
 |                   |                      |                                                                                                                            | io_meta_restore                  | io_uring/rw.c             | function parameter                 |
@@ -258,7 +258,9 @@
 |                   |                      |                                                                                                                            | io_sqd_update_thread_idle        | io_uring/sqpoll.c         | function parameter                 |
 |                   |                      |                                                                                                                            | io_sq_thread_finish              | io_uring/sqpoll.c         | local variable                     |
 |                   |                      |                                                                                                                            | io_attach_sq_data                | io_uring/sqpoll.c         | local variable, return value       |
-|                   |                      |                                                                                                                            | io_get_sq_data                   | io_uring/sqpoll.c         | local variable, return value       |
+|                   |                      |                                                                                     
+			io_uring_cmd_issue 	uring_cmd.c 	function parameter
+			io_uring_cmd_complete 	uring_cmd.c 	function parameter                                       | io_get_sq_data                   | io_uring/sqpoll.c         | local variable, return value       |
 |                   |                      |                                                                                                                            | io_sqd_events_pending            | io_uring/sqpoll.c         | function parameter                 |
 |                   |                      |                                                                                                                            | io_sqd_handle_event              | io_uring/sqpoll.c         | function parameter                 |
 |                   |                      |                                                                                                                            | io_sq_update_worktime            | io_uring/sqpoll.c         | function parameter                 |
@@ -267,15 +269,17 @@
 |                   |                      |                                                                                                                            | io_sqpoll_wq_cpu_affinity        | io_uring/sqpoll.c         | local variable                     |
 |                   |                      |                                                                                                                            | io_sq_thread_stop                | io_uring/sqpoll.h         | function parameter                 |
 |                   |                      |                                                                                                                            | io_sq_thread_park                | io_uring/sqpoll.h         | function parameter                 |
-|                   |                      |                                                                                                                            | io_sq_thread_unpark              | io_uring/sqpoll.h         | function parameter                 |
+|                   |                      |                                                                                                                            | io_sq_thread_unpark              | io_uring/sqpoll.h         | fu
+			io_uring_cmd_issue 	uring_cmd.c 	function parameter
+			io_uring_cmd_complete 	uring_cmd.c 	function parameternction parameter                 |
 |                   |                      |                                                                                                                            | io_put_sq_data                   | io_uring/sqpoll.h         | function parameter                 |
 
 // Danar
 
 ### statx.c
 
-
-|----------------|----------------|-----------------------------------------------------------|------------------------|----------------|---------------------|
+| Structure name    | Defined in           | Attributes                                                                                                                 | Caller Functions Source          | source caller             | usage                              |
+| ----------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------- | ---------------------------------- |
 | io_statx | io_uring/statx.c | file, int, unsigned int, filename, statx __user | io_statx_prep |io_uring/statx.c | function parameter, local variable |
 | | | | io_statx | function parameter, local variable |
 

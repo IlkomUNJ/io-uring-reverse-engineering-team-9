@@ -33,11 +33,17 @@ struct io_msg {
 	u32 flags;
 };
 
+/**
+ * Unlocks the uring_lock mutex for the given io_ring_ctx.
+ */
 static void io_double_unlock_ctx(struct io_ring_ctx *octx)
 {
 	mutex_unlock(&octx->uring_lock);
 }
 
+/**
+ * Attempts to lock the external io_ring_ctx, using trylock if not unlocked.
+ */
 static int io_lock_external_ctx(struct io_ring_ctx *octx,
 				unsigned int issue_flags)
 {
@@ -55,6 +61,9 @@ static int io_lock_external_ctx(struct io_ring_ctx *octx,
 	return 0;
 }
 
+/**
+ * Cleans up resources for io_msg, releasing src_file if present.
+ */
 void io_msg_ring_cleanup(struct io_kiocb *req)
 {
 	struct io_msg *msg = io_kiocb_to_cmd(req, struct io_msg);
@@ -66,11 +75,17 @@ void io_msg_ring_cleanup(struct io_kiocb *req)
 	msg->src_file = NULL;
 }
 
+/**
+ * Returns true if the target context requires remote task completion.
+ */
 static inline bool io_msg_need_remote(struct io_ring_ctx *target_ctx)
 {
 	return target_ctx->task_complete;
 }
 
+/**
+ * Completes a tw (task work) for io_msg, freeing resources and posting CQE.
+ */
 static void io_msg_tw_complete(struct io_kiocb *req, io_tw_token_t tw)
 {
 	struct io_ring_ctx *ctx = req->ctx;
@@ -86,6 +101,9 @@ static void io_msg_tw_complete(struct io_kiocb *req, io_tw_token_t tw)
 	percpu_ref_put(&ctx->refs);
 }
 
+/**
+ * Posts a remote message to the target context, scheduling task work.
+ */
 static int io_msg_remote_post(struct io_ring_ctx *ctx, struct io_kiocb *req,
 			      int res, u32 cflags, u64 user_data)
 {
@@ -104,6 +122,9 @@ static int io_msg_remote_post(struct io_ring_ctx *ctx, struct io_kiocb *req,
 	return 0;
 }
 
+/**
+ * Allocates or retrieves an io_kiocb from the target context's cache.
+ */
 static struct io_kiocb *io_msg_get_kiocb(struct io_ring_ctx *ctx)
 {
 	struct io_kiocb *req = NULL;
@@ -117,6 +138,9 @@ static struct io_kiocb *io_msg_get_kiocb(struct io_ring_ctx *ctx)
 	return kmem_cache_alloc(req_cachep, GFP_KERNEL | __GFP_NOWARN | __GFP_ZERO);
 }
 
+/**
+ * Handles sending data to a remote io_uring context.
+ */
 static int io_msg_data_remote(struct io_ring_ctx *target_ctx,
 			      struct io_msg *msg)
 {
@@ -134,6 +158,9 @@ static int io_msg_data_remote(struct io_ring_ctx *target_ctx,
 					msg->user_data);
 }
 
+/**
+ * Handles sending data to a target context, either locally or remotely.
+ */
 static int __io_msg_ring_data(struct io_ring_ctx *target_ctx,
 			      struct io_msg *msg, unsigned int issue_flags)
 {
@@ -165,6 +192,9 @@ static int __io_msg_ring_data(struct io_ring_ctx *target_ctx,
 	return ret;
 }
 
+/**
+ * Handles MSG_DATA command for io_msg_ring, dispatching to __io_msg_ring_data.
+ */
 static int io_msg_ring_data(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_ring_ctx *target_ctx = req->file->private_data;
@@ -173,6 +203,9 @@ static int io_msg_ring_data(struct io_kiocb *req, unsigned int issue_flags)
 	return __io_msg_ring_data(target_ctx, msg, issue_flags);
 }
 
+/**
+ * Grabs a file reference for the source file descriptor in io_msg.
+ */
 static int io_msg_grab_file(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_msg *msg = io_kiocb_to_cmd(req, struct io_msg);
@@ -193,6 +226,9 @@ static int io_msg_grab_file(struct io_kiocb *req, unsigned int issue_flags)
 	return ret;
 }
 
+/**
+ * Installs a file descriptor into the target context and posts a CQE if needed.
+ */
 static int io_msg_install_complete(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_ring_ctx *target_ctx = req->file->private_data;
@@ -225,6 +261,9 @@ out_unlock:
 	return ret;
 }
 
+/**
+ * Task work callback to complete file descriptor installation for io_msg.
+ */
 static void io_msg_tw_fd_complete(struct callback_head *head)
 {
 	struct io_msg *msg = container_of(head, struct io_msg, tw);
@@ -238,6 +277,9 @@ static void io_msg_tw_fd_complete(struct callback_head *head)
 	io_req_queue_tw_complete(req, ret);
 }
 
+/**
+ * Handles sending a file descriptor to a remote io_uring context.
+ */
 static int io_msg_fd_remote(struct io_kiocb *req)
 {
 	struct io_ring_ctx *ctx = req->file->private_data;
@@ -254,6 +296,9 @@ static int io_msg_fd_remote(struct io_kiocb *req)
 	return IOU_ISSUE_SKIP_COMPLETE;
 }
 
+/**
+ * Handles MSG_SEND_FD command for io_msg_ring, sending a file descriptor.
+ */
 static int io_msg_send_fd(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_ring_ctx *target_ctx = req->file->private_data;
@@ -277,6 +322,9 @@ static int io_msg_send_fd(struct io_kiocb *req, unsigned int issue_flags)
 	return io_msg_install_complete(req, issue_flags);
 }
 
+/**
+ * Prepares an io_msg structure from the given SQE.
+ */
 static int __io_msg_ring_prep(struct io_msg *msg, const struct io_uring_sqe *sqe)
 {
 	if (unlikely(sqe->buf_index || sqe->personality))
@@ -295,11 +343,17 @@ static int __io_msg_ring_prep(struct io_msg *msg, const struct io_uring_sqe *sqe
 	return 0;
 }
 
+/**
+ * Prepares an io_msg for MSG_RING operation from the SQE.
+ */
 int io_msg_ring_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return __io_msg_ring_prep(io_kiocb_to_cmd(req, struct io_msg), sqe);
 }
 
+/**
+ * Handles IORING_OP_MSG_RING requests, dispatching to the appropriate handler.
+ */
 int io_msg_ring(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_msg *msg = io_kiocb_to_cmd(req, struct io_msg);
@@ -331,6 +385,9 @@ done:
 	return IOU_OK;
 }
 
+/**
+ * Synchronously sends a MSG_RING command using the given SQE.
+ */
 int io_uring_sync_msg_ring(struct io_uring_sqe *sqe)
 {
 	struct io_msg io_msg = { };

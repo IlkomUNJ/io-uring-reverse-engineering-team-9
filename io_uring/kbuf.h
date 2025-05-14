@@ -57,30 +57,103 @@ struct buf_sel_arg {
 	unsigned short mode;
 };
 
+/**
+ * Select a buffer for the given request and return a user pointer.
+ * Used for buffer selection in io_uring operations.
+ */
 void __user *io_buffer_select(struct io_kiocb *req, size_t *len,
 			      unsigned int issue_flags);
+
+/**
+ * Select multiple buffers for the given request.
+ * Fills the buf_sel_arg structure with selected buffers.
+ */
 int io_buffers_select(struct io_kiocb *req, struct buf_sel_arg *arg,
 		      unsigned int issue_flags);
+
+/**
+ * Peek at available buffers for the given request without consuming them.
+ * Used to check buffer availability.
+ */
 int io_buffers_peek(struct io_kiocb *req, struct buf_sel_arg *arg);
+
+/**
+ * Destroy all provided buffers associated with the given context.
+ * Cleans up buffer resources.
+ */
 void io_destroy_buffers(struct io_ring_ctx *ctx);
 
+/**
+ * Prepare to remove provided buffers for the given request.
+ * Parses the SQE for buffer removal.
+ */
 int io_remove_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
+
+/**
+ * Remove provided buffers for the given request.
+ * Executes buffer removal logic.
+ */
 int io_remove_buffers(struct io_kiocb *req, unsigned int issue_flags);
 
+/**
+ * Prepare to provide new buffers for the given request.
+ * Parses the SQE for buffer provisioning.
+ */
 int io_provide_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
+
+/**
+ * Provide new buffers for the given request.
+ * Executes buffer provisioning logic.
+ */
 int io_provide_buffers(struct io_kiocb *req, unsigned int issue_flags);
 
+/**
+ * Register a provided buffer ring with the given context.
+ * Sets up buffer ring mapping.
+ */
 int io_register_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg);
+
+/**
+ * Unregister a provided buffer ring from the given context.
+ * Cleans up buffer ring mapping.
+ */
 int io_unregister_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg);
+
+/**
+ * Register the status of a provided buffer ring.
+ * Used for buffer ring status tracking.
+ */
 int io_register_pbuf_status(struct io_ring_ctx *ctx, void __user *arg);
 
+/**
+ * Recycle a legacy provided buffer for the given request.
+ * Returns true if buffer was recycled.
+ */
 bool io_kbuf_recycle_legacy(struct io_kiocb *req, unsigned issue_flags);
+
+/**
+ * Drop a legacy provided buffer for the given request.
+ * Releases buffer resources.
+ */
 void io_kbuf_drop_legacy(struct io_kiocb *req);
 
+/**
+ * Put back a number of provided buffers after use.
+ * Used for buffer accounting.
+ */
 unsigned int __io_put_kbufs(struct io_kiocb *req, int len, int nbufs);
+
+/**
+ * Commit the use of provided buffers for the given request.
+ * Marks buffers as used.
+ */
 bool io_kbuf_commit(struct io_kiocb *req,
 		    struct io_buffer_list *bl, int len, int nr);
 
+/**
+ * Get the mapped region for a provided buffer group.
+ * Returns a pointer to the mapped region.
+ */
 struct io_mapped_region *io_pbuf_get_region(struct io_ring_ctx *ctx,
 					    unsigned int bgid);
 
@@ -93,6 +166,10 @@ static inline bool io_kbuf_recycle_ring(struct io_kiocb *req)
 	 * The exception is partial io, that case we should increment bl->head
 	 * to monopolize the buffer.
 	 */
+	/**
+	 * Recycle a buffer from a buffer ring for the given request.
+	 * Clears buffer ring flags and updates buffer index.
+	 */
 	if (req->buf_list) {
 		req->buf_index = req->buf_list->bgid;
 		req->flags &= ~(REQ_F_BUFFER_RING|REQ_F_BUFFERS_COMMIT);
@@ -103,6 +180,10 @@ static inline bool io_kbuf_recycle_ring(struct io_kiocb *req)
 
 static inline bool io_do_buffer_select(struct io_kiocb *req)
 {
+	/**
+	 * Check if buffer selection should be performed for the request.
+	 * Returns true if selection is needed.
+	 */
 	if (!(req->flags & REQ_F_BUFFER_SELECT))
 		return false;
 	return !(req->flags & (REQ_F_BUFFER_SELECTED|REQ_F_BUFFER_RING));
@@ -110,6 +191,10 @@ static inline bool io_do_buffer_select(struct io_kiocb *req)
 
 static inline bool io_kbuf_recycle(struct io_kiocb *req, unsigned issue_flags)
 {
+	/**
+	 * Recycle a provided buffer for the given request if possible.
+	 * Chooses the appropriate recycling method.
+	 */
 	if (req->flags & REQ_F_BL_NO_RECYCLE)
 		return false;
 	if (req->flags & REQ_F_BUFFER_SELECTED)
@@ -122,6 +207,10 @@ static inline bool io_kbuf_recycle(struct io_kiocb *req, unsigned issue_flags)
 static inline unsigned int io_put_kbuf(struct io_kiocb *req, int len,
 				       unsigned issue_flags)
 {
+	/**
+	 * Put back a single provided buffer after use.
+	 * Used for buffer accounting.
+	 */
 	if (!(req->flags & (REQ_F_BUFFER_RING | REQ_F_BUFFER_SELECTED)))
 		return 0;
 	return __io_put_kbufs(req, len, 1);
@@ -130,6 +219,10 @@ static inline unsigned int io_put_kbuf(struct io_kiocb *req, int len,
 static inline unsigned int io_put_kbufs(struct io_kiocb *req, int len,
 					int nbufs, unsigned issue_flags)
 {
+	/**
+	 * Put back multiple provided buffers after use.
+	 * Used for buffer accounting.
+	 */
 	if (!(req->flags & (REQ_F_BUFFER_RING | REQ_F_BUFFER_SELECTED)))
 		return 0;
 	return __io_put_kbufs(req, len, nbufs);

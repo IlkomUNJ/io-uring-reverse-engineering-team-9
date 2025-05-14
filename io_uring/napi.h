@@ -9,22 +9,52 @@
 
 #ifdef CONFIG_NET_RX_BUSY_POLL
 
+/**
+ * initialize napi tracking for io_uring context
+ */
 void io_napi_init(struct io_ring_ctx *ctx);
+
+/**
+ * free napi tracking resources for io_uring context
+ */
 void io_napi_free(struct io_ring_ctx *ctx);
 
+/**
+ * register napi file descriptors for busy polling
+ */
 int io_register_napi(struct io_ring_ctx *ctx, void __user *arg);
+
+/**
+ * unregister napi file descriptors from busy polling
+ */
 int io_unregister_napi(struct io_ring_ctx *ctx, void __user *arg);
 
+/**
+ * add napi id to the context's napi tracking list
+ */
 int __io_napi_add_id(struct io_ring_ctx *ctx, unsigned int napi_id);
 
+/**
+ * perform busy loop for napi polling in io_uring
+ */
 void __io_napi_busy_loop(struct io_ring_ctx *ctx, struct io_wait_queue *iowq);
+
+/**
+ * busy poll for SQPOLL threads using napi
+ */
 int io_napi_sqpoll_busy_poll(struct io_ring_ctx *ctx);
 
+/**
+ * check if napi tracking is enabled for the context
+ */
 static inline bool io_napi(struct io_ring_ctx *ctx)
 {
 	return !list_empty(&ctx->napi_list);
 }
 
+/**
+ * run napi busy loop if napi tracking is enabled
+ */
 static inline void io_napi_busy_loop(struct io_ring_ctx *ctx,
 				     struct io_wait_queue *iowq)
 {
@@ -38,6 +68,9 @@ static inline void io_napi_busy_loop(struct io_ring_ctx *ctx,
  * @req: pointer to io_kiocb request
  *
  * Add the napi id of the socket to the napi busy poll list and hash table.
+ */
+/**
+ * add napi id from request's socket to napi tracking if dynamic tracking is enabled
  */
 static inline void io_napi_add(struct io_kiocb *req)
 {
@@ -54,31 +87,55 @@ static inline void io_napi_add(struct io_kiocb *req)
 
 #else
 
+/**
+ * dummy function for io_napi_init when busy poll is not enabled
+ */
 static inline void io_napi_init(struct io_ring_ctx *ctx)
 {
 }
+/**
+ * dummy function for io_napi_free when busy poll is not enabled
+ */
 static inline void io_napi_free(struct io_ring_ctx *ctx)
 {
 }
+/**
+ * return not supported for napi registration when busy poll is not enabled
+ */
 static inline int io_register_napi(struct io_ring_ctx *ctx, void __user *arg)
 {
 	return -EOPNOTSUPP;
 }
+/**
+ * return not supported for napi unregistration when busy poll is not enabled
+ */
 static inline int io_unregister_napi(struct io_ring_ctx *ctx, void __user *arg)
 {
 	return -EOPNOTSUPP;
 }
+/**
+ * always return false for napi tracking when busy poll is not enabled
+ */
 static inline bool io_napi(struct io_ring_ctx *ctx)
 {
 	return false;
 }
+/**
+ * dummy function for io_napi_add when busy poll is not enabled
+ */
 static inline void io_napi_add(struct io_kiocb *req)
 {
 }
+/**
+ * dummy function for io_napi_busy_loop when busy poll is not enabled
+ */
 static inline void io_napi_busy_loop(struct io_ring_ctx *ctx,
 				     struct io_wait_queue *iowq)
 {
 }
+/**
+ * always return 0 for sqpoll busy poll when busy poll is not enabled
+ */
 static inline int io_napi_sqpoll_busy_poll(struct io_ring_ctx *ctx)
 {
 	return 0;

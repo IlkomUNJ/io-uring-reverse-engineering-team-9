@@ -16,6 +16,9 @@
 #include "rsrc.h"
 
 #ifdef CONFIG_PROC_FS
+/**
+show credential information for a given id and cred structure in the seq_file output
+*/
 static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 		const struct cred *cred)
 {
@@ -47,6 +50,9 @@ static __cold int io_uring_show_cred(struct seq_file *m, unsigned int id,
 }
 
 #ifdef CONFIG_NET_RX_BUSY_POLL
+/**
+print common NAPI tracking information for io_uring fdinfo
+*/
 static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 					       struct seq_file *m,
 					       const char *tracking_strategy)
@@ -60,6 +66,9 @@ static __cold void common_tracking_show_fdinfo(struct io_ring_ctx *ctx,
 		seq_puts(m, "napi_prefer_busy_poll:\tfalse\n");
 }
 
+/**
+print NAPI tracking status and details for io_uring fdinfo
+*/
 static __cold void napi_show_fdinfo(struct io_ring_ctx *ctx,
 				    struct seq_file *m)
 {
@@ -80,6 +89,9 @@ static __cold void napi_show_fdinfo(struct io_ring_ctx *ctx,
 	}
 }
 #else
+/**
+no-op for NAPI fdinfo when CONFIG_NET_RX_BUSY_POLL is not enabled
+*/
 static inline void napi_show_fdinfo(struct io_ring_ctx *ctx,
 				    struct seq_file *m)
 {
@@ -90,6 +102,9 @@ static inline void napi_show_fdinfo(struct io_ring_ctx *ctx,
  * Caller holds a reference to the file already, we don't need to do
  * anything else to get an extra reference.
  */
+/**
+print detailed io_uring state and statistics to the seq_file for fdinfo
+*/
 __cold void io_uring_show_fdinfo(struct seq_file *m, struct file *file)
 {
 	struct io_ring_ctx *ctx = file->private_data;

@@ -2,6 +2,9 @@
 
 #include "alloc_cache.h"
 
+/**
+* Frees all entries in the allocation cache and the cache itself.
+*/
 void io_alloc_cache_free(struct io_alloc_cache *cache,
 			 void (*free)(const void *))
 {
@@ -17,6 +20,10 @@ void io_alloc_cache_free(struct io_alloc_cache *cache,
 	cache->entries = NULL;
 }
 
+/**
+* Initializes an allocation cache.
+* Returns true if initialization fails, false otherwise.
+*/
 /* returns false if the cache was initialized properly */
 bool io_alloc_cache_init(struct io_alloc_cache *cache,
 			 unsigned max_nr, unsigned int size,
@@ -33,6 +40,10 @@ bool io_alloc_cache_init(struct io_alloc_cache *cache,
 	return false;
 }
 
+/**
+* Allocates a new object from kernel memory.
+* Used when the cache is empty or a new object is needed.
+*/
 void *io_cache_alloc_new(struct io_alloc_cache *cache, gfp_t gfp)
 {
 	void *obj;

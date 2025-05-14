@@ -25,6 +25,11 @@ enum {
 	IO_EVENTFD_OP_SIGNAL_BIT,
 };
 
+/**
+ * Frees the io_ev_fd structure and its associated eventfd context.
+ * This function is called through RCU (Read-Copy-Update) mechanism when the last
+ * reference to the eventfd is released.
+ */
 static void io_eventfd_free(struct rcu_head *rcu)
 {
 	struct io_ev_fd *ev_fd = container_of(rcu, struct io_ev_fd, rcu);
@@ -33,12 +38,22 @@ static void io_eventfd_free(struct rcu_head *rcu)
 	kfree(ev_fd);
 }
 
+/**
+ * Decrements the reference count of the io_ev_fd structure.
+ * When the reference count reaches zero, schedules the structure for deletion
+ * through RCU mechanism.
+ */
 static void io_eventfd_put(struct io_ev_fd *ev_fd)
 {
 	if (refcount_dec_and_test(&ev_fd->refs))
 		call_rcu(&ev_fd->rcu, io_eventfd_free);
 }
 
+/**
+ * Performs the actual signal operation on the eventfd in an RCU callback context.
+ * This function signals the eventfd with EPOLL_URING_WAKE mask and releases
+ * the reference to the io_ev_fd structure.
+ */
 static void io_eventfd_do_signal(struct rcu_head *rcu)
 {
 	struct io_ev_fd *ev_fd = container_of(rcu, struct io_ev_fd, rcu);
@@ -47,6 +62,10 @@ static void io_eventfd_do_signal(struct rcu_head *rcu)
 	io_eventfd_put(ev_fd);
 }
 
+/**
+ * Releases resources associated with an io_ev_fd structure.
+ * Decrements the reference count if put_ref is true and releases the RCU read lock.
+ */
 static void io_eventfd_release(struct io_ev_fd *ev_fd, bool put_ref)
 {
 	if (put_ref)
@@ -112,6 +131,10 @@ static struct io_ev_fd *io_eventfd_grab(struct io_ring_ctx *ctx)
 	return NULL;
 }
 
+/**
+ * Signals the completion queue eventfd.
+ * This function is used to notify waiting processes about new completion queue entries.
+ */
 void io_eventfd_signal(struct io_ring_ctx *ctx)
 {
 	struct io_ev_fd *ev_fd;
@@ -121,6 +144,11 @@ void io_eventfd_signal(struct io_ring_ctx *ctx)
 		io_eventfd_release(ev_fd, __io_eventfd_signal(ev_fd));
 }
 
+/**
+ * Signals the completion queue eventfd only if new events have been added.
+ * This function ensures that the eventfd signal count accurately reflects
+ * the presence of new completion queue entries.
+ */
 void io_eventfd_flush_signal(struct io_ring_ctx *ctx)
 {
 	struct io_ev_fd *ev_fd;
@@ -150,6 +178,11 @@ void io_eventfd_flush_signal(struct io_ring_ctx *ctx)
 	}
 }
 
+/**
+ * Registers an eventfd with the io_uring instance.
+ * Sets up the eventfd notification mechanism for completion queue events.
+ * The eventfd can be configured for async operation based on the eventfd_async parameter.
+ */
 int io_eventfd_register(struct io_ring_ctx *ctx, void __user *arg,
 			unsigned int eventfd_async)
 {
@@ -189,6 +222,11 @@ int io_eventfd_register(struct io_ring_ctx *ctx, void __user *arg,
 	return 0;
 }
 
+/**
+ * Unregisters the eventfd from the io_uring instance.
+ * Removes the eventfd notification mechanism and releases associated resources.
+ * Returns 0 on success, -ENXIO if no eventfd was registered.
+ */
 int io_eventfd_unregister(struct io_ring_ctx *ctx)
 {
 	struct io_ev_fd *ev_fd;

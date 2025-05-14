@@ -22,6 +22,10 @@ struct io_xattr {
 	struct filename			*filename;
 };
 
+/**
+ * io_xattr_cleanup - Cleans up resources after xattr operation.
+ * Frees the filename and kernel xattr context.
+ */
 void io_xattr_cleanup(struct io_kiocb *req)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -33,6 +37,10 @@ void io_xattr_cleanup(struct io_kiocb *req)
 	kvfree(ix->ctx.kvalue);
 }
 
+/**
+ * io_xattr_finish - Finalizes the xattr operation.
+ * Cleans up resources and sets the result for the request.
+ */
 static void io_xattr_finish(struct io_kiocb *req, int ret)
 {
 	req->flags &= ~REQ_F_NEED_CLEANUP;
@@ -41,6 +49,11 @@ static void io_xattr_finish(struct io_kiocb *req, int ret)
 	io_req_set_res(req, ret, 0);
 }
 
+/**
+ * __io_getxattr_prep - Prepare an async getxattr request.
+ * Validates input, copies user-space xattr name into kernel memory.
+ * Returns 0 on success or error.
+ */
 static int __io_getxattr_prep(struct io_kiocb *req,
 			      const struct io_uring_sqe *sqe)
 {
@@ -73,11 +86,20 @@ static int __io_getxattr_prep(struct io_kiocb *req,
 	return 0;
 }
 
+/**
+ * io_fgetxattr_prep - Wrapper for file-based getxattr prep.
+ * Calls __io_getxattr_prep with no filename (fgetxattr case).
+ */
 int io_fgetxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return __io_getxattr_prep(req, sqe);
 }
 
+/**
+ * io_getxattr_prep - Prepare a path-based getxattr request.
+ * Validates input, gets filename via getname(), and prepares context.
+ * Returns 0 on success or error.
+ */
 int io_getxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -100,6 +122,11 @@ int io_getxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_fgetxattr - Execute asynchronous file-based getxattr.
+ * Uses file pointer and prepped context to fetch extended attribute.
+ * Always completes synchronously.
+ */
 int io_fgetxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -112,6 +139,11 @@ int io_fgetxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_getxattr - Execute asynchronous path-based getxattr.
+ * Fetches extended attribute for given path.
+ * Always completes synchronously.
+ */
 int io_getxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -125,6 +157,11 @@ int io_getxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * __io_setxattr_prep - Prepare an async setxattr request.
+ * Copies user-space xattr name and value into kernel memory.
+ * Returns 0 on success or error.
+ */
 static int __io_setxattr_prep(struct io_kiocb *req,
 			const struct io_uring_sqe *sqe)
 {
@@ -154,6 +191,11 @@ static int __io_setxattr_prep(struct io_kiocb *req,
 	return 0;
 }
 
+/**
+ * io_setxattr_prep - Prepare a path-based setxattr request.
+ * Validates input, gets filename via getname(), and prepares context.
+ * Returns 0 on success or error.
+ */
 int io_setxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -176,11 +218,20 @@ int io_setxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ * io_fsetxattr_prep - Wrapper for file-based setxattr prep.
+ * Calls __io_setxattr_prep with no filename (fsetxattr case).
+ */
 int io_fsetxattr_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	return __io_setxattr_prep(req, sqe);
 }
 
+/**
+ * io_fsetxattr - Execute asynchronous file-based setxattr.
+ * Sets extended attribute on a file descriptor.
+ * Always completes synchronously.
+ */
 int io_fsetxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);
@@ -193,6 +244,11 @@ int io_fsetxattr(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ * io_setxattr - Execute asynchronous path-based setxattr.
+ * Sets extended attribute on a file by path.
+ * Always completes synchronously.
+ */
 int io_setxattr(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_xattr *ix = io_kiocb_to_cmd(req, struct io_xattr);

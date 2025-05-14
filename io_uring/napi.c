@@ -8,6 +8,9 @@
 /* Timeout for cleanout of stale entries. */
 #define NAPI_TIMEOUT		(60 * SEC_CONVERSION)
 
+/**
+ * Find a napi entry in the hash list by napi_id.
+ */
 struct io_napi_entry {
 	unsigned int		napi_id;
 	struct list_head	list;
@@ -32,12 +35,18 @@ static struct io_napi_entry *io_napi_hash_find(struct hlist_head *hash_list,
 	return NULL;
 }
 
+/**
+ * Convert network time to ktime format.
+ */
 static inline ktime_t net_to_ktime(unsigned long t)
 {
 	/* napi approximating usecs, reverse busy_loop_current_time */
 	return ns_to_ktime(t << 10);
 }
 
+/**
+ * Add a napi id to the context's napi hash table and list.
+ */
 int __io_napi_add_id(struct io_ring_ctx *ctx, unsigned int napi_id)
 {
 	struct hlist_head *hash_list;
@@ -81,6 +90,9 @@ int __io_napi_add_id(struct io_ring_ctx *ctx, unsigned int napi_id)
 	return 0;
 }
 
+/**
+ * Remove a napi id from the context's napi hash table and list.
+ */
 static int __io_napi_del_id(struct io_ring_ctx *ctx, unsigned int napi_id)
 {
 	struct hlist_head *hash_list;
@@ -102,6 +114,9 @@ static int __io_napi_del_id(struct io_ring_ctx *ctx, unsigned int napi_id)
 	return 0;
 }
 
+/**
+ * Remove stale napi entries from the context.
+ */
 static void __io_napi_remove_stale(struct io_ring_ctx *ctx)
 {
 	struct io_napi_entry *e;
@@ -122,12 +137,18 @@ static void __io_napi_remove_stale(struct io_ring_ctx *ctx)
 	}
 }
 
+/**
+ * Remove stale napi entries if is_stale is true.
+ */
 static inline void io_napi_remove_stale(struct io_ring_ctx *ctx, bool is_stale)
 {
 	if (is_stale)
 		__io_napi_remove_stale(ctx);
 }
 
+/**
+ * Check if busy loop timeout has occurred.
+ */
 static inline bool io_napi_busy_loop_timeout(ktime_t start_time,
 					     ktime_t bp)
 {
@@ -141,6 +162,9 @@ static inline bool io_napi_busy_loop_timeout(ktime_t start_time,
 	return true;
 }
 
+/**
+ * Determine if the busy loop should end for the given wait queue.
+ */
 static bool io_napi_busy_loop_should_end(void *data,
 					 unsigned long start_time)
 {
@@ -172,6 +196,9 @@ static bool static_tracking_do_busy_loop(struct io_ring_ctx *ctx,
 	return false;
 }
 
+/**
+ * Perform busy loop for dynamic napi tracking and check for stale entries.
+ */
 static bool
 dynamic_tracking_do_busy_loop(struct io_ring_ctx *ctx,
 			      bool (*loop_end)(void *, unsigned long),
@@ -191,6 +218,9 @@ dynamic_tracking_do_busy_loop(struct io_ring_ctx *ctx,
 	return is_stale;
 }
 
+/**
+ * Run the appropriate busy loop based on napi tracking mode.
+ */
 static inline bool
 __io_napi_do_busy_loop(struct io_ring_ctx *ctx,
 		       bool (*loop_end)(void *, unsigned long),
@@ -201,6 +231,9 @@ __io_napi_do_busy_loop(struct io_ring_ctx *ctx,
 	return dynamic_tracking_do_busy_loop(ctx, loop_end, loop_end_arg);
 }
 
+/**
+ * Run blocking busy loop for napi in the context.
+ */
 static void io_napi_blocking_busy_loop(struct io_ring_ctx *ctx,
 				       struct io_wait_queue *iowq)
 {
@@ -234,6 +267,9 @@ static void io_napi_blocking_busy_loop(struct io_ring_ctx *ctx,
  *
  * Init napi settings in the io-uring context.
  */
+/**
+ * Initialize napi settings in the io_uring context.
+ */
 void io_napi_init(struct io_ring_ctx *ctx)
 {
 	u64 sys_dt = READ_ONCE(sysctl_net_busy_poll) * NSEC_PER_USEC;
@@ -251,6 +287,9 @@ void io_napi_init(struct io_ring_ctx *ctx)
  *
  * Free the napi list and the hash table in the io-uring context.
  */
+/**
+ * Free napi list and hash table in the context.
+ */
 void io_napi_free(struct io_ring_ctx *ctx)
 {
 	struct io_napi_entry *e;
@@ -263,6 +302,9 @@ void io_napi_free(struct io_ring_ctx *ctx)
 	INIT_LIST_HEAD_RCU(&ctx->napi_list);
 }
 
+/**
+ * Register napi tracking mode and settings in the context.
+ */
 static int io_napi_register_napi(struct io_ring_ctx *ctx,
 				 struct io_uring_napi *napi)
 {
@@ -287,6 +329,9 @@ static int io_napi_register_napi(struct io_ring_ctx *ctx,
  * @arg: pointer to io_uring_napi structure
  *
  * Register napi in the io-uring context.
+ */
+/**
+ * Register napi with io_uring context.
  */
 int io_register_napi(struct io_ring_ctx *ctx, void __user *arg)
 {
@@ -330,6 +375,9 @@ int io_register_napi(struct io_ring_ctx *ctx, void __user *arg)
  *
  * Unregister napi. If arg has been specified copy the busy poll timeout and
  * prefer busy poll setting to the passed in structure.
+ */
+/**
+ * Unregister napi from io_uring context.
  */
 int io_unregister_napi(struct io_ring_ctx *ctx, void __user *arg)
 {

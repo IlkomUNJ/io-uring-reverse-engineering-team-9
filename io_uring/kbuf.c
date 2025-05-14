@@ -30,8 +30,11 @@ struct io_provide_buf {
 	__u32				bgid;
 	__u32				nbufs;
 	__u16				bid;
-};
+}
 
+/**
+ *increment buffer ring commit pointer, consuming up to 'len' bytes
+ */
 static bool io_kbuf_inc_commit(struct io_buffer_list *bl, int len)
 {
 	while (len) {
@@ -51,6 +54,9 @@ static bool io_kbuf_inc_commit(struct io_buffer_list *bl, int len)
 	return true;
 }
 
+/**
+ *commit selected buffer(s) for a request, updating buffer list state
+ */
 bool io_kbuf_commit(struct io_kiocb *req,
 		    struct io_buffer_list *bl, int len, int nr)
 {
@@ -67,6 +73,9 @@ bool io_kbuf_commit(struct io_kiocb *req,
 	return true;
 }
 
+/**
+ *get buffer list for a given buffer group id from context
+ */
 static inline struct io_buffer_list *io_buffer_get_list(struct io_ring_ctx *ctx,
 							unsigned int bgid)
 {
@@ -75,6 +84,9 @@ static inline struct io_buffer_list *io_buffer_get_list(struct io_ring_ctx *ctx,
 	return xa_load(&ctx->io_bl_xa, bgid);
 }
 
+/**
+ *add a buffer list to the context's buffer group id mapping
+ */
 static int io_buffer_add_list(struct io_ring_ctx *ctx,
 			      struct io_buffer_list *bl, unsigned int bgid)
 {
@@ -88,6 +100,9 @@ static int io_buffer_add_list(struct io_ring_ctx *ctx,
 	return xa_err(xa_store(&ctx->io_bl_xa, bgid, bl, GFP_KERNEL));
 }
 
+/**
+ *free legacy buffer and clear selection flags for request
+ */
 void io_kbuf_drop_legacy(struct io_kiocb *req)
 {
 	if (WARN_ON_ONCE(!(req->flags & REQ_F_BUFFER_SELECTED)))
@@ -98,6 +113,9 @@ void io_kbuf_drop_legacy(struct io_kiocb *req)
 	req->kbuf = NULL;
 }
 
+/**
+ *recycle legacy buffer by returning it to the buffer list
+ */
 bool io_kbuf_recycle_legacy(struct io_kiocb *req, unsigned issue_flags)
 {
 	struct io_ring_ctx *ctx = req->ctx;
@@ -116,6 +134,9 @@ bool io_kbuf_recycle_legacy(struct io_kiocb *req, unsigned issue_flags)
 	return true;
 }
 
+/**
+ *select a provided buffer from the buffer list for the request
+ */
 static void __user *io_provided_buffer_select(struct io_kiocb *req, size_t *len,
 					      struct io_buffer_list *bl)
 {
@@ -136,6 +157,9 @@ static void __user *io_provided_buffer_select(struct io_kiocb *req, size_t *len,
 	return NULL;
 }
 
+/**
+ *select a provided buffer and fill iovec for the request
+ */
 static int io_provided_buffers_select(struct io_kiocb *req, size_t *len,
 				      struct io_buffer_list *bl,
 				      struct iovec *iov)
@@ -151,6 +175,9 @@ static int io_provided_buffers_select(struct io_kiocb *req, size_t *len,
 	return 1;
 }
 
+/**
+ *select a buffer from a buffer ring for the request
+ */
 static void __user *io_ring_buffer_select(struct io_kiocb *req, size_t *len,
 					  struct io_buffer_list *bl,
 					  unsigned int issue_flags)
@@ -192,6 +219,9 @@ static void __user *io_ring_buffer_select(struct io_kiocb *req, size_t *len,
 	return ret;
 }
 
+/**
+ *select a buffer for the request, handling both buffer ring and legacy
+ */
 void __user *io_buffer_select(struct io_kiocb *req, size_t *len,
 			      unsigned int issue_flags)
 {
@@ -215,6 +245,9 @@ void __user *io_buffer_select(struct io_kiocb *req, size_t *len,
 /* cap it at a reasonable 256, will be one page even for 4K */
 #define PEEK_MAX_IMPORT		256
 
+/**
+ *peek available buffers from a buffer ring and fill iovec array
+ */
 static int io_ring_buffers_peek(struct io_kiocb *req, struct buf_sel_arg *arg,
 				struct io_buffer_list *bl)
 {
@@ -294,6 +327,9 @@ static int io_ring_buffers_peek(struct io_kiocb *req, struct buf_sel_arg *arg,
 	return iov - arg->iovs;
 }
 
+/**
+ *select buffers for a request, handling both buffer ring and legacy
+ */
 int io_buffers_select(struct io_kiocb *req, struct buf_sel_arg *arg,
 		      unsigned int issue_flags)
 {
@@ -327,6 +363,9 @@ out_unlock:
 	return ret;
 }
 
+/**
+ *peek buffers for a request under uring_lock, no locking/unlocking
+ */
 int io_buffers_peek(struct io_kiocb *req, struct buf_sel_arg *arg)
 {
 	struct io_ring_ctx *ctx = req->ctx;
@@ -350,6 +389,9 @@ int io_buffers_peek(struct io_kiocb *req, struct buf_sel_arg *arg)
 	return io_provided_buffers_select(req, &arg->max_len, bl, arg->iovs);
 }
 
+/**
+ *commit buffer ring buffers for a request and clear buffer ring flag
+ */
 static inline bool __io_put_kbuf_ring(struct io_kiocb *req, int len, int nr)
 {
 	struct io_buffer_list *bl = req->buf_list;
@@ -363,6 +405,9 @@ static inline bool __io_put_kbuf_ring(struct io_kiocb *req, int len, int nr)
 	return ret;
 }
 
+/**
+ *finalize buffer usage for a request and return CQE buffer flag
+ */
 unsigned int __io_put_kbufs(struct io_kiocb *req, int len, int nbufs)
 {
 	unsigned int ret;
@@ -379,6 +424,9 @@ unsigned int __io_put_kbufs(struct io_kiocb *req, int len, int nbufs)
 	return ret;
 }
 
+/**
+ *remove up to nbufs buffers from a buffer list
+ */
 static int __io_remove_buffers(struct io_ring_ctx *ctx,
 			       struct io_buffer_list *bl, unsigned nbufs)
 {
@@ -415,12 +463,18 @@ static int __io_remove_buffers(struct io_ring_ctx *ctx,
 	return i;
 }
 
+/**
+ *free all buffers in a buffer list and release the list
+ */
 static void io_put_bl(struct io_ring_ctx *ctx, struct io_buffer_list *bl)
 {
 	__io_remove_buffers(ctx, bl, -1U);
 	kfree(bl);
 }
 
+/**
+ *destroy all buffer lists in the context
+ */
 void io_destroy_buffers(struct io_ring_ctx *ctx)
 {
 	struct io_buffer_list *bl;
@@ -439,6 +493,9 @@ void io_destroy_buffers(struct io_ring_ctx *ctx)
 	}
 }
 
+/**
+ *destroy a single buffer list and remove from context
+ */
 static void io_destroy_bl(struct io_ring_ctx *ctx, struct io_buffer_list *bl)
 {
 	scoped_guard(mutex, &ctx->mmap_lock)
@@ -446,6 +503,9 @@ static void io_destroy_bl(struct io_ring_ctx *ctx, struct io_buffer_list *bl)
 	io_put_bl(ctx, bl);
 }
 
+/**
+ *prepare for removing buffers, validate SQE fields and fill provide_buf struct
+ */
 int io_remove_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_provide_buf *p = io_kiocb_to_cmd(req, struct io_provide_buf);
@@ -465,6 +525,9 @@ int io_remove_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+ *remove buffers from a buffer list, handling locking and result reporting
+ */
 int io_remove_buffers(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_provide_buf *p = io_kiocb_to_cmd(req, struct io_provide_buf);
@@ -489,6 +552,9 @@ int io_remove_buffers(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+ *prepare for providing buffers, validate SQE fields and fill provide_buf struct
+ */
 int io_provide_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	unsigned long size, tmp_check;
@@ -525,6 +591,9 @@ int io_provide_buffers_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe
 	return 0;
 }
 
+/**
+ *add provided buffers to a buffer list
+ */
 static int io_add_buffers(struct io_ring_ctx *ctx, struct io_provide_buf *pbuf,
 			  struct io_buffer_list *bl)
 {
@@ -550,6 +619,9 @@ static int io_add_buffers(struct io_ring_ctx *ctx, struct io_provide_buf *pbuf,
 	return i ? 0 : -ENOMEM;
 }
 
+/**
+ *provide buffers to a buffer list, allocating if needed
+ */
 int io_provide_buffers(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_provide_buf *p = io_kiocb_to_cmd(req, struct io_provide_buf);
@@ -589,6 +661,9 @@ err:
 	return IOU_OK;
 }
 
+/**
+ *register a buffer ring with the context, mapping memory as needed
+ */
 int io_register_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg)
 {
 	struct io_uring_buf_reg reg;
@@ -671,6 +746,9 @@ fail:
 	return ret;
 }
 
+/**
+ *unregister a buffer ring from the context
+ */
 int io_unregister_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg)
 {
 	struct io_uring_buf_reg reg;
@@ -698,6 +776,9 @@ int io_unregister_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg)
 	return 0;
 }
 
+/**
+ *get buffer ring status for a buffer group
+ */
 int io_register_pbuf_status(struct io_ring_ctx *ctx, void __user *arg)
 {
 	struct io_uring_buf_status buf_status;
@@ -724,6 +805,9 @@ int io_register_pbuf_status(struct io_ring_ctx *ctx, void __user *arg)
 	return 0;
 }
 
+/**
+ *get mapped region for a buffer ring by buffer group id
+ */
 struct io_mapped_region *io_pbuf_get_region(struct io_ring_ctx *ctx,
 					    unsigned int bgid)
 {

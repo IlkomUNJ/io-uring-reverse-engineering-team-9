@@ -27,8 +27,11 @@ enum {
 	IO_SQ_THREAD_SHOULD_PARK,
 };
 
-void io_sq_thread_unpark(struct io_sq_data *sqd)
-	__releases(&sqd->lock)
+/**
+* Unparks the submission queue (SQ) thread.
+* This function clears the park bit and wakes up the SQ thread.
+*/
+void io_sq_thread_unpark(struct io_sq_data *sqd) __releases(&sqd->lock)
 {
 	WARN_ON_ONCE(sqd->thread == current);
 
@@ -43,8 +46,13 @@ void io_sq_thread_unpark(struct io_sq_data *sqd)
 	wake_up(&sqd->wait);
 }
 
-void io_sq_thread_park(struct io_sq_data *sqd)
-	__acquires(&sqd->lock)
+/**
+* Parks the submission queue (SQ) thread.
+* This function sets the IO_SQ_THREAD_SHOULD_PARK bit in sqd->state,
+* increments the park_pending counter, and wakes up the SQ thread
+* if it exists, so it can notice the park request.
+*/
+void io_sq_thread_park(struct io_sq_data *sqd) __acquires(&sqd->lock)
 {
 	WARN_ON_ONCE(data_race(sqd->thread) == current);
 
@@ -55,6 +63,11 @@ void io_sq_thread_park(struct io_sq_data *sqd)
 		wake_up_process(sqd->thread);
 }
 
+/**
+* Stops the submission queue (SQ) thread.
+* Sets the IO_SQ_THREAD_SHOULD_STOP bit in sqd->state,
+* wakes up the SQ thread if it exists, and waits for its completion.
+*/
 void io_sq_thread_stop(struct io_sq_data *sqd)
 {
 	WARN_ON_ONCE(sqd->thread == current);
@@ -68,6 +81,11 @@ void io_sq_thread_stop(struct io_sq_data *sqd)
 	wait_for_completion(&sqd->exited);
 }
 
+/**
+* Decrements the reference count of the submission queue data.
+* If the reference count drops to zero, it stops the SQ thread
+* and frees the sqd structure.
+*/
 void io_put_sq_data(struct io_sq_data *sqd)
 {
 	if (refcount_dec_and_test(&sqd->refs)) {
@@ -78,6 +96,11 @@ void io_put_sq_data(struct io_sq_data *sqd)
 	}
 }
 
+/**
+* Updates the idle timeout for the submission queue thread.
+* Iterates through all contexts associated with the sqd and sets
+* sqd->sq_thread_idle to the maximum of their sq_thread_idle values.
+*/
 static __cold void io_sqd_update_thread_idle(struct io_sq_data *sqd)
 {
 	struct io_ring_ctx *ctx;
@@ -88,6 +111,12 @@ static __cold void io_sqd_update_thread_idle(struct io_sq_data *sqd)
 	sqd->sq_thread_idle = sq_thread_idle;
 }
 
+/**
+* Finalizes the submission queue thread association for a context.
+* Parks the SQ thread, removes the context from the sqd's list,
+* updates the thread idle time, unparks the thread, and then
+* releases the reference to the sqd.
+*/
 void io_sq_thread_finish(struct io_ring_ctx *ctx)
 {
 	struct io_sq_data *sqd = ctx->sq_data;
@@ -103,6 +132,11 @@ void io_sq_thread_finish(struct io_ring_ctx *ctx)
 	}
 }
 
+/**
+* Attaches to an existing submission queue data structure.
+* This is used when IORING_SETUP_ATTACH_WQ is specified. It finds the
+* sq_data associated with the wq_fd and increments its reference count.
+*/
 static struct io_sq_data *io_attach_sq_data(struct io_uring_params *p)
 {
 	struct io_ring_ctx *ctx_attach;
@@ -125,6 +159,12 @@ static struct io_sq_data *io_attach_sq_data(struct io_uring_params *p)
 	return sqd;
 }
 
+/**
+* Retrieves or creates submission queue data (sqd).
+* If IORING_SETUP_ATTACH_WQ is set, it attempts to attach to an existing sqd.
+* Otherwise, or if attachment fails permissively, it allocates and
+* initializes a new sqd structure.
+*/
 static struct io_sq_data *io_get_sq_data(struct io_uring_params *p,
 					 bool *attached)
 {
@@ -155,11 +195,22 @@ static struct io_sq_data *io_get_sq_data(struct io_uring_params *p,
 	return sqd;
 }
 
+/**
+* Checks if there are pending events for the submission queue thread.
+* Returns true if sqd->state is non-zero, indicating events like
+* park or stop requests.
+*/
 static inline bool io_sqd_events_pending(struct io_sq_data *sqd)
 {
 	return READ_ONCE(sqd->state);
 }
 
+/**
+* Processes submission queue entries for a given context within the SQ thread.
+* Submits up to a capped number of entries and handles I/O polling.
+* It overrides credentials if necessary and ensures submissions don't
+* happen if the context references are dying or the ring is disabled.
+*/
 static int __io_sq_thread(struct io_ring_ctx *ctx, bool cap_entries)
 {
 	unsigned int to_submit;
@@ -198,6 +249,11 @@ static int __io_sq_thread(struct io_ring_ctx *ctx, bool cap_entries)
 	return ret;
 }
 
+/**
+* Handles events for the submission queue thread, such as park or stop.
+* If a park request is pending or a signal is received, it waits.
+* Returns true if the thread should stop or a signal was handled.
+*/
 static bool io_sqd_handle_event(struct io_sq_data *sqd)
 {
 	bool did_sig = false;
@@ -216,11 +272,11 @@ static bool io_sqd_handle_event(struct io_sq_data *sqd)
 }
 
 /*
- * Run task_work, processing the retry_list first. The retry_list holds
+* Run task_work, processing the retry_list first. The retry_list holds
  * entries that we passed on in the previous run, if we had more task_work
- * than we were asked to process. Newly queued task_work isn't run until the
+* than we were asked to process. Newly queued task_work isn't run until the
  * retry list has been fully processed.
- */
+*/
 static unsigned int io_sq_tw(struct llist_node **retry_list, int max_entries)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -239,6 +295,11 @@ out:
 	return count;
 }
 
+/**
+* Checks if there is pending task work for the I/O uring task.
+* Returns true if the retry_list is not empty or the task_list
+* in the current io_uring_task context is not empty.
+*/
 static bool io_sq_tw_pending(struct llist_node *retry_list)
 {
 	struct io_uring_task *tctx = current->io_uring;
@@ -246,6 +307,11 @@ static bool io_sq_tw_pending(struct llist_node *retry_list)
 	return retry_list || !llist_empty(&tctx->task_list);
 }
 
+/**
+* Updates the accumulated system time spent by the SQ thread.
+* Calculates the difference in system time usage from 'start' to current
+* and adds it to sqd->work_time.
+*/
 static void io_sq_update_worktime(struct io_sq_data *sqd, struct rusage *start)
 {
 	struct rusage end;
@@ -257,6 +323,12 @@ static void io_sq_update_worktime(struct io_sq_data *sqd, struct rusage *start)
 	sqd->work_time += end.ru_stime.tv_usec + end.ru_stime.tv_sec * 1000000;
 }
 
+/**
+* Main loop for the submission queue (SQ) poll thread.
+* This kernel thread handles asynchronous submission of I/O requests,
+* manages its lifecycle (parking, stopping), processes task work,
+* and interacts with associated I/O ring contexts.
+*/
 static int io_sq_thread(void *data)
 {
 	struct llist_node *retry_list = NULL;
@@ -389,6 +461,12 @@ err_out:
 	do_exit(0);
 }
 
+/**
+* Waits if the submission queue is full.
+* This function is called by applications when they need to submit more
+* SQEs but the submission queue ring is currently full. It waits until
+* space becomes available or a signal is pending.
+*/
 void io_sqpoll_wait_sq(struct io_ring_ctx *ctx)
 {
 	DEFINE_WAIT(wait);
@@ -406,6 +484,12 @@ void io_sqpoll_wait_sq(struct io_ring_ctx *ctx)
 	finish_wait(&ctx->sqo_sq_wait, &wait);
 }
 
+/**
+* Creates and configures the submission queue offload mechanism.
+* If IORING_SETUP_SQPOLL is specified, it sets up a dedicated kernel
+* thread (SQPOLL thread) to handle submissions, potentially attaching
+* to an existing one or creating a new one with specified affinity.
+*/
 __cold int io_sq_offload_create(struct io_ring_ctx *ctx,
 				struct io_uring_params *p)
 {
@@ -508,6 +592,12 @@ err:
 	return ret;
 }
 
+/**
+* Sets the CPU affinity for the I/O worker queue of an SQPOLL thread.
+* If the context has an associated SQPOLL thread, this function parks
+* the thread, attempts to set the CPU affinity of its I/O worker queue,
+* and then unparks the thread.
+*/
 __cold int io_sqpoll_wq_cpu_affinity(struct io_ring_ctx *ctx,
 				     cpumask_var_t mask)
 {

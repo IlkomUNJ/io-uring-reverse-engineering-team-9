@@ -39,12 +39,20 @@
 #include "truncate.h"
 #include "zcrx.h"
 
+/**
+ * Handles operations that should not be issued.
+ * Warns and returns -ECANCELED.
+ */
 static int io_no_issue(struct io_kiocb *req, unsigned int issue_flags)
 {
 	WARN_ON_ONCE(1);
 	return -ECANCELED;
 }
 
+/**
+ * Preparation function for operations that are not supported.
+ * Returns -EOPNOTSUPP.
+ */
 static __maybe_unused int io_eopnotsupp_prep(struct io_kiocb *kiocb,
 					     const struct io_uring_sqe *sqe)
 {
@@ -817,6 +825,10 @@ const struct io_cold_def io_cold_defs[] = {
 	},
 };
 
+/**
+ * Retrieves the string representation of an io_uring opcode.
+ * Returns "INVALID" for unknown opcodes.
+ */
 const char *io_uring_get_opcode(u8 opcode)
 {
 	if (opcode < IORING_OP_LAST)
@@ -824,6 +836,10 @@ const char *io_uring_get_opcode(u8 opcode)
 	return "INVALID";
 }
 
+/**
+ * Checks if a given io_uring opcode is supported.
+ * Verifies against the defined issue definitions.
+ */
 bool io_uring_op_supported(u8 opcode)
 {
 	if (opcode < IORING_OP_LAST &&
@@ -832,6 +848,10 @@ bool io_uring_op_supported(u8 opcode)
 	return false;
 }
 
+/**
+ * Initializes the io_uring operation definition tables.
+ * Performs build-time and run-time checks on table consistency.
+ */
 void __init io_uring_optable_init(void)
 {
 	int i;

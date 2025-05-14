@@ -23,15 +23,29 @@ struct io_notif_data {
 	bool			zc_copied;
 };
 
+/**
+ * allocate a notification request from the given io_ring_ctx
+ */
 struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx);
+
+/**
+ * complete a zerocopy send operation and notify the user
+ */
 void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
 			 bool success);
 
+/**
+ * convert an io_kiocb pointer to its associated io_notif_data
+ */
 static inline struct io_notif_data *io_notif_to_data(struct io_kiocb *notif)
 {
 	return io_kiocb_to_cmd(notif, struct io_notif_data);
 }
 
+/**
+ * flush the notification and complete any outstanding zerocopy operation
+ * must be called with uring_lock held
+ */
 static inline void io_notif_flush(struct io_kiocb *notif)
 	__must_hold(&notif->ctx->uring_lock)
 {
@@ -40,6 +54,9 @@ static inline void io_notif_flush(struct io_kiocb *notif)
 	io_tx_ubuf_complete(NULL, &nd->uarg, true);
 }
 
+/**
+ * account memory usage for a notification operation
+ */
 static inline int io_notif_account_mem(struct io_kiocb *notif, unsigned len)
 {
 	struct io_ring_ctx *ctx = notif->ctx;

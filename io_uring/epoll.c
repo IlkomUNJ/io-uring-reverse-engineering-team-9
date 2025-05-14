@@ -26,6 +26,11 @@ struct io_epoll_wait {
 	struct epoll_event __user	*events;
 };
 
+/**
+* Prepares an epoll control operation by initializing the io_epoll structure with data from the submission queue entry.
+* Validates input parameters and copies epoll event from user space if required.
+* Returns 0 on success, -EINVAL for invalid parameters, -EFAULT for user space access errors
+*/
 int io_epoll_ctl_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_epoll *epoll = io_kiocb_to_cmd(req, struct io_epoll);
@@ -68,6 +73,11 @@ int io_epoll_ctl(struct io_kiocb *req, unsigned int issue_flags)
 	return IOU_OK;
 }
 
+/**
+* Prepares an epoll wait operation by setting up wait parameters from the submission queue entry.
+* Validates input and stores maximum events and user space buffer for results.
+* Returns 0 on success, -EINVAL for invalid parameters
+*/
 int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 {
 	struct io_epoll_wait *iew = io_kiocb_to_cmd(req, struct io_epoll_wait);
@@ -80,6 +90,11 @@ int io_epoll_wait_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
 	return 0;
 }
 
+/**
+* Executes epoll wait operation by checking and sending available events to user space.
+* Monitors file descriptors for events and copies results to user space.
+* Returns IOU_OK on success, -EAGAIN if no events available
+*/
 int io_epoll_wait(struct io_kiocb *req, unsigned int issue_flags)
 {
 	struct io_epoll_wait *iew = io_kiocb_to_cmd(req, struct io_epoll_wait);

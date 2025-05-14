@@ -27,6 +27,10 @@ struct async_poll {
  * Must only be called inside issue_flags & IO_URING_F_MULTISHOT, or
  * potentially other cases where we already "own" this poll request.
  */
+/**
+* Increments the poll_refs counter for a multishot poll request.
+* This is used to keep track of retries for multishot polls.
+*/
 static inline void io_poll_multishot_retry(struct io_kiocb *req)
 {
 	atomic_inc(&req->poll_refs);
